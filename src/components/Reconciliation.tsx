@@ -8,7 +8,7 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
+  Grid2 as Grid,
   Alert,
   Divider,
   Table,
@@ -88,11 +88,6 @@ const Reconciliation: React.FC = () => {
     return <Warning color="warning" />
   }
 
-  const getStatusColor = (difference: number) => {
-    if (Math.abs(difference) < 0.01) return 'success'
-    return 'warning'
-  }
-
   return (
     <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
       <Typography variant="h5" gutterBottom color="primary">
@@ -108,7 +103,7 @@ const Reconciliation: React.FC = () => {
       </Alert>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Select Date & Enter Actual Amounts
@@ -143,7 +138,7 @@ const Reconciliation: React.FC = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Expected vs Actual
