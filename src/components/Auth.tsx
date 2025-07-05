@@ -10,13 +10,17 @@ import {
   Tab,
   Tabs,
   Container,
+  IconButton,
+  InputAdornment,
 } from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 
 const Auth: React.FC = () => {
   const [tab, setTab] = useState(0)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -46,6 +50,10 @@ const Auth: React.FC = () => {
     }
 
     setLoading(false)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -85,11 +93,24 @@ const Auth: React.FC = () => {
             <TextField
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               margin="normal"
               required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                      aria-label="toggle password visibility"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}

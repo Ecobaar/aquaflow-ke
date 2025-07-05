@@ -14,18 +14,101 @@ export type Database = {
           id: number
           name: string
           phone: string | null
+          user_id: string | null
         }
         Insert: {
           id?: number
           name: string
           phone?: string | null
+          user_id?: string | null
         }
         Update: {
           id?: number
           name?: string
           phone?: string | null
+          user_id?: string | null
         }
         Relationships: []
+      }
+      daily_summaries: {
+        Row: {
+          cash_total: number | null
+          created_at: string | null
+          date: string
+          debt_total: number | null
+          id: string
+          till_total: number | null
+          total_sales: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cash_total?: number | null
+          created_at?: string | null
+          date: string
+          debt_total?: number | null
+          id?: string
+          till_total?: number | null
+          total_sales?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cash_total?: number | null
+          created_at?: string | null
+          date?: string
+          debt_total?: number | null
+          id?: string
+          till_total?: number | null
+          total_sales?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      debt_notifications: {
+        Row: {
+          created_at: string | null
+          customer_id: number | null
+          customer_name: string
+          debt_amount: number
+          id: string
+          is_cleared: boolean | null
+          last_notification_sent: string | null
+          transaction_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id?: number | null
+          customer_name: string
+          debt_amount: number
+          id?: string
+          is_cleared?: boolean | null
+          last_notification_sent?: string | null
+          transaction_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: number | null
+          customer_name?: string
+          debt_amount?: number
+          id?: string
+          is_cleared?: boolean | null
+          last_notification_sent?: string | null
+          transaction_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debt_notifications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       expenses: {
         Row: {
@@ -33,18 +116,21 @@ export type Database = {
           created_at: string | null
           description: string
           id: number
+          user_id: string | null
         }
         Insert: {
           amount: number
           created_at?: string | null
           description: string
           id?: number
+          user_id?: string | null
         }
         Update: {
           amount?: number
           created_at?: string | null
           description?: string
           id?: number
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -53,25 +139,37 @@ export type Database = {
           amount: number
           created_at: string | null
           customer_id: number | null
+          customer_name: string | null
+          description: string | null
           id: number
           paid: boolean
+          paid_status: boolean | null
           payment_method: string
+          user_id: string | null
         }
         Insert: {
           amount: number
           created_at?: string | null
           customer_id?: number | null
+          customer_name?: string | null
+          description?: string | null
           id?: number
           paid?: boolean
+          paid_status?: boolean | null
           payment_method: string
+          user_id?: string | null
         }
         Update: {
           amount?: number
           created_at?: string | null
           customer_id?: number | null
+          customer_name?: string | null
+          description?: string | null
           id?: number
           paid?: boolean
+          paid_status?: boolean | null
           payment_method?: string
+          user_id?: string | null
         }
         Relationships: [
           {

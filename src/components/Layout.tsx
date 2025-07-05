@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Box,
   BottomNavigation,
@@ -21,8 +21,11 @@ import {
   MoneyOff,
   AccountBalanceWallet,
   ExitToApp,
+  DarkMode,
+  LightMode,
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme as useAppTheme } from '../contexts/ThemeContext'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -32,6 +35,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
   const { signOut } = useAuth()
+  const { isDark, toggleTheme } = useAppTheme()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -53,6 +57,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             AquaFlow
           </Typography>
+          <IconButton
+            color="inherit"
+            onClick={toggleTheme}
+            aria-label="toggle theme"
+          >
+            {isDark ? <LightMode /> : <DarkMode />}
+          </IconButton>
           <IconButton
             color="inherit"
             onClick={signOut}
