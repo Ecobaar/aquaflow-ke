@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import {
-  Calculator,
+  Calculate,
   Receipt,
   PointOfSale,
   AccountBalance,
@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const tabs = [
-    { label: 'Calculator', icon: <Calculator /> },
+    { label: 'Calculator', icon: <Calculate /> },
     { label: 'Records', icon: <Receipt /> },
     { label: 'Sale', icon: <PointOfSale /> },
     { label: 'Debts', icon: <AccountBalance /> },
