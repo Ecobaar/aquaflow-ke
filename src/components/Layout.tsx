@@ -23,6 +23,7 @@ import {
   ExitToApp,
   DarkMode,
   LightMode,
+  Person,
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme as useAppTheme } from '../contexts/ThemeContext'
@@ -31,9 +32,10 @@ interface LayoutProps {
   children: React.ReactNode
   activeTab: number
   onTabChange: (tab: number) => void
+  onProfileClick?: () => void
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
+const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onProfileClick }) => {
   const { signOut } = useAuth()
   const { isDark, toggleTheme } = useAppTheme()
   const theme = useTheme()
@@ -57,6 +59,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             AquaFlow
           </Typography>
+          <IconButton
+            color="inherit"
+            onClick={onProfileClick}
+            aria-label="profile"
+          >
+            <Person />
+          </IconButton>
           <IconButton
             color="inherit"
             onClick={toggleTheme}

@@ -13,12 +13,14 @@ import Records from './components/Records'
 import CustomerManager from './components/CustomerManager'
 import Sales from './components/Sales'
 import Reconciliation from './components/Reconciliation'
+import UserProfile from './components/UserProfile'
 import Placeholder from './components/Placeholder'
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth()
   const { isDark } = useTheme()
   const [activeTab, setActiveTab] = useState(0)
+  const [showProfile, setShowProfile] = useState(false)
 
   const theme = createTheme({
     palette: {
@@ -69,6 +71,21 @@ const AppContent: React.FC = () => {
     return <Auth />
   }
 
+  if (showProfile) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Layout 
+          activeTab={-1} 
+          onTabChange={() => {}} 
+          onProfileClick={() => setShowProfile(false)}
+        >
+          <UserProfile />
+        </Layout>
+      </ThemeProvider>
+    )
+  }
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
@@ -95,7 +112,11 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Layout activeTab={activeTab} onTabChange={setActiveTab}>
+      <Layout 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+        onProfileClick={() => setShowProfile(true)}
+      >
         {renderTabContent()}
       </Layout>
     </ThemeProvider>
