@@ -12,7 +12,6 @@ import {
   TableRow,
   Card,
   CardContent,
-  Grid,
   Chip,
   Button,
   Dialog,
@@ -138,68 +137,60 @@ const Records: React.FC = () => {
       </Typography>
 
       {/* Summary Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <TrendingUp color="primary" sx={{ mr: 1 }} />
-                <Typography variant="body2" color="text.secondary">
-                  Total Sales
-                </Typography>
-              </Box>
-              <Typography variant="h6" color="primary">
-                {formatCurrency(totalStats.totalSales)}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 2, mb: 3 }}>
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <TrendingUp color="primary" sx={{ mr: 1 }} />
+              <Typography variant="body2" color="text.secondary">
+                Total Sales
               </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Receipt color="success" sx={{ mr: 1 }} />
-                <Typography variant="body2" color="text.secondary">
-                  Cash Total
-                </Typography>
-              </Box>
-              <Typography variant="h6" color="success.main">
-                {formatCurrency(totalStats.totalCash)}
+            </Box>
+            <Typography variant="h6" color="primary">
+              {formatCurrency(totalStats.totalSales)}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Receipt color="success" sx={{ mr: 1 }} />
+              <Typography variant="body2" color="text.secondary">
+                Cash Total
               </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <AccountBalance color="info" sx={{ mr: 1 }} />
-                <Typography variant="body2" color="text.secondary">
-                  Till Total
-                </Typography>
-              </Box>
-              <Typography variant="h6" color="info.main">
-                {formatCurrency(totalStats.totalTill)}
+            </Box>
+            <Typography variant="h6" color="success.main">
+              {formatCurrency(totalStats.totalCash)}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <AccountBalance color="info" sx={{ mr: 1 }} />
+              <Typography variant="body2" color="text.secondary">
+                Till Total
               </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <TrendingDown color="warning" sx={{ mr: 1 }} />
-                <Typography variant="body2" color="text.secondary">
-                  Outstanding Debts
-                </Typography>
-              </Box>
-              <Typography variant="h6" color="warning.main">
-                {formatCurrency(totalStats.totalDebt)}
+            </Box>
+            <Typography variant="h6" color="info.main">
+              {formatCurrency(totalStats.totalTill)}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <TrendingDown color="warning" sx={{ mr: 1 }} />
+              <Typography variant="body2" color="text.secondary">
+                Outstanding Debts
               </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            </Box>
+            <Typography variant="h6" color="warning.main">
+              {formatCurrency(totalStats.totalDebt)}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Daily Records Table */}
       <Paper>

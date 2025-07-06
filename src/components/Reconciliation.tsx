@@ -8,7 +8,6 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Alert,
   Divider,
   Table,
@@ -102,8 +101,8 @@ const Reconciliation: React.FC = () => {
         </Typography>
       </Alert>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+      <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+        <Box sx={{ flex: 1 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Select Date & Enter Actual Amounts
@@ -136,9 +135,9 @@ const Reconciliation: React.FC = () => {
               inputProps={{ min: 0, step: 0.01 }}
             />
           </Paper>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: 1 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Expected vs Actual
@@ -219,8 +218,8 @@ const Reconciliation: React.FC = () => {
               </Alert>
             )}
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       <Paper sx={{ p: 3, mt: 3 }}>
         <Typography variant="h6" gutterBottom>
