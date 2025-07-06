@@ -1,0 +1,33 @@
+
+{
+  "name": "AquaFlow - Water Refill Station Management",
+  "short_name": "AquaFlow",
+  "description": "Complete management system for water refill stations",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1976d2",
+  "theme_color": "#1976d2",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}

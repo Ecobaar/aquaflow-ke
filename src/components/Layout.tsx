@@ -24,6 +24,7 @@ import {
   DarkMode,
   LightMode,
   Person,
+  AdminPanelSettings,
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme as useAppTheme } from '../contexts/ThemeContext'
@@ -33,9 +34,16 @@ interface LayoutProps {
   activeTab: number
   onTabChange: (tab: number) => void
   onProfileClick?: () => void
+  onAdminClick?: () => void
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onProfileClick }) => {
+const Layout: React.FC<LayoutProps> = ({ 
+  children, 
+  activeTab, 
+  onTabChange, 
+  onProfileClick,
+  onAdminClick 
+}) => {
   const { signOut } = useAuth()
   const { isDark, toggleTheme } = useAppTheme()
   const theme = useTheme()
@@ -59,6 +67,15 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onPro
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             AquaFlow
           </Typography>
+          {onAdminClick && (
+            <IconButton
+              color="inherit"
+              onClick={onAdminClick}
+              aria-label="admin panel"
+            >
+              <AdminPanelSettings />
+            </IconButton>
+          )}
           <IconButton
             color="inherit"
             onClick={onProfileClick}

@@ -5,6 +5,7 @@ import { CssBaseline, CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { AdminProvider, useAdmin } from './contexts/AdminContext'
 import { ThemeProvider as CustomThemeProvider, useTheme } from './contexts/ThemeContext'
 import Auth from './components/Auth'
 import Layout from './components/Layout'
@@ -14,13 +15,17 @@ import CustomerManager from './components/CustomerManager'
 import Sales from './components/Sales'
 import Reconciliation from './components/Reconciliation'
 import UserProfile from './components/UserProfile'
+import AdminPanel from './components/AdminPanel'
+import InstallPrompt from './components/InstallPrompt'
 import Placeholder from './components/Placeholder'
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth()
+  const { isAdmin } = useAdmin()
   const { isDark } = useTheme()
   const [activeTab, setActiveTab] = useState(0)
   const [showProfile, setShowProfile] = useState(false)
+  const [showAdmin, setShowAdmin] = useState(false)
 
   const theme = createTheme({
     palette: {
@@ -79,8 +84,25 @@ const AppContent: React.FC = () => {
           activeTab={-1} 
           onTabChange={() => {}} 
           onProfileClick={() => setShowProfile(false)}
+          onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
         >
           <UserProfile />
+        </Layout>
+      </ThemeProvider>
+    )
+  }
+
+  if (showAdmin && isAdmin) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Layout 
+          activeTab={-1} 
+          onTabChange={() => {}} 
+          onProfileClick={() => setShowProfile(true)}
+          onAdminClick={() => setShowAdmin(false)}
+        >
+          <AdminPanel />
         </Layout>
       </ThemeProvider>
     )
@@ -116,9 +138,11 @@ const AppContent: React.FC = () => {
         activeTab={activeTab} 
         onTabChange={setActiveTab}
         onProfileClick={() => setShowProfile(true)}
+        onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
       >
         {renderTabContent()}
       </Layout>
+      <InstallPrompt />
     </ThemeProvider>
   )
 }
@@ -128,7 +152,9 @@ const App: React.FC = () => {
     <CustomThemeProvider>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <AuthProvider>
-          <AppContent />
+          <AdminProvider>
+            <AppContent />
+          </AdminProvider>
         </AuthProvider>
       </LocalizationProvider>
     </CustomThemeProvider>
