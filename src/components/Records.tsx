@@ -12,7 +12,7 @@ import {
   TableRow,
   Card,
   CardContent,
-  Grid2 as Grid,
+  Grid,
   Chip,
   Button,
   Dialog,
@@ -139,7 +139,7 @@ const Records: React.FC = () => {
 
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid xs={6} md={3}>
+        <Grid item xs={6} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -154,7 +154,7 @@ const Records: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={6} md={3}>
+        <Grid item xs={6} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -169,7 +169,7 @@ const Records: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={6} md={3}>
+        <Grid item xs={6} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -184,7 +184,7 @@ const Records: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={6} md={3}>
+        <Grid item xs={6} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>

@@ -8,7 +8,7 @@ import {
   Button,
   Card,
   CardContent,
-  Grid2 as Grid,
+  Grid,
   Alert,
   Divider,
   Table,
@@ -103,7 +103,7 @@ const Reconciliation: React.FC = () => {
       </Alert>
 
       <Grid container spacing={3}>
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Select Date & Enter Actual Amounts
@@ -138,7 +138,7 @@ const Reconciliation: React.FC = () => {
           </Paper>
         </Grid>
 
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Expected vs Actual
