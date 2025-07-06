@@ -12,7 +12,7 @@ import {
   Switch,
   FormControlLabel,
 } from '@mui/material'
-import { Person, ExitToApp, Settings, Save } from '@mui/icons-material'
+import { Person, ExitToApp, Settings, Save, Business } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
 
@@ -22,11 +22,13 @@ interface UserProfile {
   full_name?: string
   phone?: string
   business_name?: string
+  station_name?: string
 }
 
 const UserProfile: React.FC = () => {
   const { user, signOut } = useAuth()
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [stationProfile, setStationProfile] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -40,9 +42,26 @@ const UserProfile: React.FC = () => {
         full_name: user.user_metadata?.full_name || '',
         phone: user.user_metadata?.phone || '',
         business_name: user.user_metadata?.business_name || '',
+        station_name: user.user_metadata?.station_name || '',
       })
+      fetchStationProfile()
     }
   }, [user])
+
+  const fetchStationProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .maybeSingle()
+
+      if (error && error.code !== 'PGRST116') throw error
+      setStationProfile(data)
+    } catch (error: any) {
+      console.error('Error fetching station profile:', error)
+    }
+  }
 
   const handleSave = async () => {
     if (!profile) return
@@ -51,17 +70,31 @@ const UserProfile: React.FC = () => {
     setMessage(null)
 
     try {
-      const { error } = await supabase.auth.updateUser({
+      // Update auth user metadata
+      const { error: authError } = await supabase.auth.updateUser({
         data: {
           full_name: profile.full_name,
           phone: profile.phone,
           business_name: profile.business_name,
+          station_name: profile.station_name,
         }
       })
 
-      if (error) throw error
+      if (authError) throw authError
+
+      // Update or insert station profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user?.id,
+          station_name: profile.station_name,
+          updated_at: new Date().toISOString(),
+        })
+
+      if (profileError) throw profileError
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' })
+      fetchStationProfile()
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message })
     } finally {
@@ -114,6 +147,12 @@ const UserProfile: React.FC = () => {
             <Typography variant="body2" color="text.secondary">
               {profile.email}
             </Typography>
+            {stationProfile?.station_name && (
+              <Typography variant="body2" color="primary" sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                <Business sx={{ fontSize: 16, mr: 0.5 }} />
+                {stationProfile.station_name}
+              </Typography>
+            )}
           </Box>
         </Box>
 
@@ -142,11 +181,21 @@ const UserProfile: React.FC = () => {
 
         <TextField
           fullWidth
-          label="Business Name"
+          label="Water Station Name"
+          value={profile.station_name || ''}
+          onChange={(e) => setProfile({ ...profile, station_name: e.target.value })}
+          margin="normal"
+          helperText="This is your business name that will be used throughout the system"
+          required
+        />
+
+        <TextField
+          fullWidth
+          label="Business Name (Optional)"
           value={profile.business_name || ''}
           onChange={(e) => setProfile({ ...profile, business_name: e.target.value })}
           margin="normal"
-          helperText="Optional: Name of your water refill station"
+          helperText="Additional business information"
         />
 
         <TextField

@@ -110,6 +110,42 @@ export type Database = {
           },
         ]
       }
+      debts: {
+        Row: {
+          amount: number
+          created_at: string | null
+          customer_name: string
+          description: string | null
+          due_date: string | null
+          id: string
+          is_paid: boolean | null
+          paid_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          customer_name: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_paid?: boolean | null
+          paid_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          customer_name?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_paid?: boolean | null
+          paid_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -131,6 +167,27 @@ export type Database = {
           description?: string
           id?: number
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          station_name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          station_name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          station_name?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

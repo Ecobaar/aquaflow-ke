@@ -23,6 +23,7 @@ const Auth: React.FC = () => {
   const [tab, setTab] = useState(0)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [stationName, setStationName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -80,8 +81,24 @@ const Auth: React.FC = () => {
         setError(error.message)
       }
     } else {
-      // Sign Up
-      const { error } = await signUp(email, password)
+      // Sign Up - include station name in metadata
+      if (!stationName.trim()) {
+        setError('Water station name is required')
+        setLoading(false)
+        return
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            station_name: stationName.trim()
+          }
+        }
+      })
+
       if (error) {
         setError(error.message)
       } else {
@@ -191,6 +208,20 @@ const Auth: React.FC = () => {
               margin="normal"
               required
             />
+            
+            {tab === 1 && (
+              <TextField
+                fullWidth
+                label="Water Station Name"
+                value={stationName}
+                onChange={(e) => setStationName(e.target.value)}
+                margin="normal"
+                required
+                placeholder="e.g., Maji Fresh Water Station"
+                helperText="This will help identify your business in the system"
+              />
+            )}
+            
             <TextField
               fullWidth
               label="Password"

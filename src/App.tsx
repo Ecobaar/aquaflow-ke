@@ -17,6 +17,9 @@ import Reconciliation from './components/Reconciliation'
 import UserProfile from './components/UserProfile'
 import AdminPanel from './components/AdminPanel'
 import InstallPrompt from './components/InstallPrompt'
+import DebtManager from './components/DebtManager'
+import Analytics from './components/Analytics'
+import Expenses from './components/Expenses'
 import Placeholder from './components/Placeholder'
 
 const AppContent: React.FC = () => {
@@ -117,13 +120,13 @@ const AppContent: React.FC = () => {
       case 2:
         return <Sales />
       case 3:
-        return <Placeholder title="Debt Management" description="Track customer debts and repayments" />
+        return <DebtManager />
       case 4:
         return <Placeholder title="Reports" description="Generate daily, weekly, monthly, and yearly sales summaries" />
       case 5:
-        return <Placeholder title="Analytics" description="Visualize sales data and customer insights" />
+        return <Analytics />
       case 6:
-        return <Placeholder title="Expenses" description="Track business expenses" />
+        return <Expenses />
       case 7:
         return <Reconciliation />
       default:
