@@ -21,7 +21,7 @@ import {
   Alert,
   Card,
   CardContent,
-  Grid,
+  Grid2 as Grid,
 } from '@mui/material'
 import { Add, Edit, Delete, CheckCircle, MoneyOff } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
@@ -208,7 +208,7 @@ const DebtManager: React.FC = () => {
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
@@ -220,7 +220,7 @@ const DebtManager: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
