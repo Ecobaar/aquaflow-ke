@@ -4,121 +4,129 @@ import {
   Box,
   Paper,
   TextField,
+  Button,
   Typography,
+  Grid,
   Card,
   CardContent,
-  Button,
-  Divider,
 } from '@mui/material'
+import { Calculate, Add, Remove } from '@mui/icons-material'
 
 const Calculator: React.FC = () => {
-  const [cashInput, setCashInput] = useState('')
-  const [tillInput, setTillInput] = useState('')
+  const [pricePerLiter, setPricePerLiter] = useState<number>(5)
+  const [liters, setLiters] = useState<number>(0)
+  const [total, setTotal] = useState<number>(0)
 
-  const parseValues = (input: string): number[] => {
-    if (!input.trim()) return []
-    
-    return input
-      .split(/[,\s+]+/)
-      .map(val => val.trim())
-      .filter(val => val !== '')
-      .map(val => parseFloat(val))
-      .filter(val => !isNaN(val))
+  const calculateTotal = () => {
+    const calculatedTotal = pricePerLiter * liters
+    setTotal(calculatedTotal)
   }
 
-  const cashValues = parseValues(cashInput)
-  const tillValues = parseValues(tillInput)
+  const addLiter = () => {
+    const newLiters = liters + 1
+    setLiters(newLiters)
+    setTotal(pricePerLiter * newLiters)
+  }
 
-  const cashTotal = cashValues.reduce((sum, val) => sum + val, 0)
-  const tillTotal = tillValues.reduce((sum, val) => sum + val, 0)
-  const grandTotal = cashTotal + tillTotal
+  const removeLiter = () => {
+    if (liters > 0) {
+      const newLiters = liters - 1
+      setLiters(newLiters)
+      setTotal(pricePerLiter * newLiters)
+    }
+  }
 
-  const clearAll = () => {
-    setCashInput('')
-    setTillInput('')
+  const reset = () => {
+    setLiters(0)
+    setTotal(0)
   }
 
   return (
     <Box sx={{ p: 2, maxWidth: 600, mx: 'auto' }}>
-      <Typography variant="h5" gutterBottom color="primary">
-        Cash & Till Calculator
+      <Typography variant="h5" gutterBottom color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Calculate />
+        Water Calculator
       </Typography>
 
       <Paper sx={{ p: 3, mb: 3 }}>
-        <TextField
-          fullWidth
-          label="Cash Values (comma, space, or + separated)"
-          value={cashInput}
-          onChange={(e) => setCashInput(e.target.value)}
-          placeholder="100, 200 + 50"
-          margin="normal"
-          multiline
-          rows={2}
-        />
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Price per Liter (KSh)"
+              type="number"
+              value={pricePerLiter}
+              onChange={(e) => setPricePerLiter(Number(e.target.value) || 0)}
+              inputProps={{ min: 0, step: 0.5 }}
+            />
+          </Grid>
 
-        <TextField
-          fullWidth
-          label="Till Values (comma, space, or + separated)"
-          value={tillInput}
-          onChange={(e) => setTillInput(e.target.value)}
-          placeholder="1000, 500 + 250"
-          margin="normal"
-          multiline
-          rows={2}
-        />
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={removeLiter}
+                disabled={liters <= 0}
+                sx={{ minWidth: 50 }}
+              >
+                <Remove />
+              </Button>
+              
+              <TextField
+                label="Liters"
+                type="number"
+                value={liters}
+                onChange={(e) => setLiters(Number(e.target.value) || 0)}
+                inputProps={{ min: 0, step: 0.5 }}
+                sx={{ flex: 1 }}
+              />
+              
+              <Button
+                variant="outlined"
+                onClick={addLiter}
+                sx={{ minWidth: 50 }}
+              >
+                <Add />
+              </Button>
+            </Box>
+          </Grid>
 
-        <Button
-          variant="outlined"
-          onClick={clearAll}
-          sx={{ mt: 2 }}
-          fullWidth
-        >
-          Clear All
-        </Button>
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant="contained"
+                onClick={calculateTotal}
+                fullWidth
+                size="large"
+              >
+                Calculate
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={reset}
+                fullWidth
+                size="large"
+              >
+                Reset
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
       </Paper>
 
-      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" color="success.main" gutterBottom>
-              Cash Total
-            </Typography>
-            <Typography variant="h4" color="success.main">
-              KSh {cashTotal.toLocaleString()}
-            </Typography>
-            {cashValues.length > 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {cashValues.join(' + ')}
-              </Typography>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <Typography variant="h6" color="info.main" gutterBottom>
-              Till Total
-            </Typography>
-            <Typography variant="h4" color="info.main">
-              KSh {tillTotal.toLocaleString()}
-            </Typography>
-            {tillValues.length > 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {tillValues.join(' + ')}
-              </Typography>
-            )}
-          </CardContent>
-        </Card>
-      </Box>
-
-      <Paper sx={{ p: 3, mt: 3, textAlign: 'center', bgcolor: 'primary.main', color: 'white' }}>
-        <Typography variant="h6" gutterBottom>
-          Grand Total
-        </Typography>
-        <Typography variant="h3">
-          KSh {grandTotal.toLocaleString()}
-        </Typography>
-      </Paper>
+      <Card sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+        <CardContent sx={{ textAlign: 'center' }}>
+          <Typography variant="h6" gutterBottom>
+            Total Amount
+          </Typography>
+          <Typography variant="h3" component="div">
+            KSh {total.toFixed(2)}
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
+            {liters} liters × KSh {pricePerLiter}
+          </Typography>
+        </CardContent>
+      </Card>
     </Box>
   )
 }

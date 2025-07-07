@@ -4,28 +4,28 @@ import {
   Box,
   Paper,
   Typography,
-  TextField,
-  Button,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  IconButton,
-  Alert,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextField,
+  IconButton,
+  Alert,
   Card,
   CardContent,
+  Grid,
 } from '@mui/material'
-import { Add, Edit, Delete, Receipt } from '@mui/icons-material'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { useAuth } from '../contexts/AuthContext'
+import { Add, Edit, Delete, MoneyOff } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
-import dayjs, { Dayjs } from 'dayjs'
+import { useAuth } from '../contexts/AuthContext'
+import dayjs from 'dayjs'
 
 interface Expense {
   id: number
@@ -35,15 +35,15 @@ interface Expense {
 }
 
 const Expenses: React.FC = () => {
-  const { user } = useAuth()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
-  const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs())
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+
+  const { user } = useAuth()
 
   useEffect(() => {
     if (user) {
@@ -53,6 +53,7 @@ const Expenses: React.FC = () => {
 
   const fetchExpenses = async () => {
     try {
+      setLoading(true)
       const { data, error } = await supabase
         .from('expenses')
         .select('*')
@@ -62,65 +63,64 @@ const Expenses: React.FC = () => {
       if (error) throw error
       setExpenses(data || [])
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message })
+      setError(error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSubmit = async () => {
-    if (!description.trim() || !amount) {
-      setMessage({ type: 'error', text: 'Description and amount are required' })
-      return
-    }
+  const handleSave = async () => {
+    if (!description.trim() || !amount) return
+
+    setLoading(true)
+    setError(null)
 
     try {
       if (editingExpense) {
         const { error } = await supabase
           .from('expenses')
           .update({
-            description,
+            description: description.trim(),
             amount: parseFloat(amount),
           })
           .eq('id', editingExpense.id)
 
         if (error) throw error
-        setMessage({ type: 'success', text: 'Expense updated successfully!' })
       } else {
         const { error } = await supabase
           .from('expenses')
           .insert({
-            user_id: user?.id,
-            description,
+            description: description.trim(),
             amount: parseFloat(amount),
-            created_at: selectedDate?.toISOString() || new Date().toISOString(),
+            user_id: user?.id!,
           })
 
         if (error) throw error
-        setMessage({ type: 'success', text: 'Expense added successfully!' })
       }
 
-      handleClose()
+      setDialogOpen(false)
+      resetForm()
       fetchExpenses()
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message })
+      setError(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleDelete = async (expenseId: number) => {
-    if (window.confirm('Are you sure you want to delete this expense?')) {
-      try {
-        const { error } = await supabase
-          .from('expenses')
-          .delete()
-          .eq('id', expenseId)
+  const handleDelete = async (expense: Expense) => {
+    if (!confirm(`Delete expense "${expense.description}"?`)) return
 
-        if (error) throw error
-        setMessage({ type: 'success', text: 'Expense deleted successfully!' })
-        fetchExpenses()
-      } catch (error: any) {
-        setMessage({ type: 'error', text: error.message })
-      }
+    try {
+      const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('id', expense.id)
+
+      if (error) throw error
+      fetchExpenses()
+    } catch (error: any) {
+      setError(error.message)
     }
   }
 
@@ -128,122 +128,118 @@ const Expenses: React.FC = () => {
     setEditingExpense(expense)
     setDescription(expense.description)
     setAmount(expense.amount.toString())
-    setSelectedDate(dayjs(expense.created_at))
-    setOpen(true)
+    setDialogOpen(true)
   }
 
-  const handleClose = () => {
-    setOpen(false)
+  const resetForm = () => {
     setEditingExpense(null)
     setDescription('')
     setAmount('')
-    setSelectedDate(dayjs())
   }
 
-  // Calculate totals
+  const openNewDialog = () => {
+    resetForm()
+    setDialogOpen(true)
+  }
+
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
-  const thisMonthExpenses = expenses
-    .filter(e => dayjs(e.created_at).isSame(dayjs(), 'month'))
-    .reduce((sum, expense) => sum + expense.amount, 0)
-  const todayExpenses = expenses
-    .filter(e => dayjs(e.created_at).isSame(dayjs(), 'day'))
-    .reduce((sum, expense) => sum + expense.amount, 0)
+
+  if (loading && expenses.length === 0) {
+    return (
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <Typography>Loading expenses...</Typography>
+      </Box>
+    )
+  }
 
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant="h5" gutterBottom color="primary">
-        <Receipt sx={{ mr: 1, verticalAlign: 'middle' }} />
-        Expense Management
-      </Typography>
-
-      {message && (
-        <Alert severity={message.type} sx={{ mb: 2 }} onClose={() => setMessage(null)}>
-          {message.text}
-        </Alert>
-      )}
-
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              Today's Expenses
-            </Typography>
-            <Typography variant="h5" color="error">
-              KSh {todayExpenses.toLocaleString()}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              This Month
-            </Typography>
-            <Typography variant="h5" color="warning.main">
-              KSh {thisMonthExpenses.toLocaleString()}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              Total Expenses
-            </Typography>
-            <Typography variant="h5">
-              KSh {totalExpenses.toLocaleString()}
-            </Typography>
-          </CardContent>
-        </Card>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h5" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <MoneyOff />
+          Expenses
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={openNewDialog}
+        >
+          Add Expense
+        </Button>
       </Box>
 
-      <Button
-        variant="contained"
-        startIcon={<Add />}
-        onClick={() => setOpen(true)}
-        sx={{ mb: 2 }}
-      >
-        Add New Expense
-      </Button>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Total Expenses
+              </Typography>
+              <Typography variant="h4" color="error">
+                KSh {totalExpenses.toLocaleString()}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                This Month
+              </Typography>
+              <Typography variant="h4" color="warning.main">
+                KSh {expenses
+                  .filter(expense => dayjs(expense.created_at).isAfter(dayjs().startOf('month')))
+                  .reduce((sum, expense) => sum + expense.amount, 0)
+                  .toLocaleString()}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Date</TableCell>
               <TableCell>Description</TableCell>
-              <TableCell>Amount</TableCell>
+              <TableCell>Amount (KSh)</TableCell>
+              <TableCell>Date</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {expenses.map((expense) => (
               <TableRow key={expense.id}>
-                <TableCell>
-                  {dayjs(expense.created_at).format('MMM DD, YYYY')}
-                </TableCell>
                 <TableCell>{expense.description}</TableCell>
-                <TableCell>KSh {expense.amount.toLocaleString()}</TableCell>
+                <TableCell>{expense.amount.toLocaleString()}</TableCell>
+                <TableCell>
+                  {dayjs(expense.created_at).format('MMM DD, YYYY HH:mm')}
+                </TableCell>
                 <TableCell>
                   <IconButton
+                    size="small"
                     onClick={() => handleEdit(expense)}
                     color="primary"
-                    title="Edit"
                   >
-                    <Edit />
+                    <Edit fontSize="small" />
                   </IconButton>
                   <IconButton
-                    onClick={() => handleDelete(expense.id)}
+                    size="small"
+                    onClick={() => handleDelete(expense)}
                     color="error"
-                    title="Delete"
                   >
-                    <Delete />
+                    <Delete fontSize="small" />
                   </IconButton>
                 </TableCell>
               </TableRow>
             ))}
             {expenses.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} sx={{ textAlign: 'center', py: 3 }}>
-                  No expenses found
+                <TableCell colSpan={4} align="center">
+                  No expenses recorded yet
                 </TableCell>
               </TableRow>
             )}
@@ -251,42 +247,37 @@ const Expenses: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
           {editingExpense ? 'Edit Expense' : 'Add New Expense'}
         </DialogTitle>
         <DialogContent>
           <TextField
-            fullWidth
+            autoFocus
+            margin="dense"
             label="Description"
+            fullWidth
+            variant="outlined"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            margin="normal"
             required
-            placeholder="e.g., Water pump maintenance, Electricity bill"
           />
           <TextField
-            fullWidth
+            margin="dense"
             label="Amount (KSh)"
             type="number"
+            fullWidth
+            variant="outlined"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            margin="normal"
             required
+            inputProps={{ min: 0, step: 0.01 }}
           />
-          {!editingExpense && (
-            <DatePicker
-              label="Date"
-              value={selectedDate}
-              onChange={setSelectedDate}
-              sx={{ mt: 2, width: '100%' }}
-            />
-          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            {editingExpense ? 'Update' : 'Add'} Expense
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSave} variant="contained" disabled={loading || !description.trim() || !amount}>
+            {loading ? 'Saving...' : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>

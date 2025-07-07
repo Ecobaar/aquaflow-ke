@@ -4,50 +4,53 @@ import {
   Box,
   Paper,
   Typography,
-  TextField,
-  Button,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  IconButton,
-  Chip,
-  Alert,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextField,
+  Chip,
+  IconButton,
+  Alert,
+  Card,
+  CardContent,
+  Grid,
 } from '@mui/material'
-import { Add, Edit, Delete, Check, AttachMoney } from '@mui/icons-material'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { useAuth } from '../contexts/AuthContext'
+import { Add, Edit, Delete, CheckCircle, MoneyOff } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
-import dayjs, { Dayjs } from 'dayjs'
+import { useAuth } from '../contexts/AuthContext'
+import dayjs from 'dayjs'
 
 interface Debt {
   id: string
   customer_name: string
   amount: number
-  description?: string
+  description: string | null
   is_paid: boolean
   created_at: string
-  paid_at?: string
-  due_date?: string
+  paid_at: string | null
+  due_date: string | null
 }
 
 const DebtManager: React.FC = () => {
-  const { user } = useAuth()
   const [debts, setDebts] = useState<Debt[]>([])
   const [loading, setLoading] = useState(true)
-  const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [editingDebt, setEditingDebt] = useState<Debt | null>(null)
   const [customerName, setCustomerName] = useState('')
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
-  const [dueDate, setDueDate] = useState<Dayjs | null>(null)
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [dueDate, setDueDate] = useState('')
+
+  const { user } = useAuth()
 
   useEffect(() => {
     if (user) {
@@ -57,6 +60,7 @@ const DebtManager: React.FC = () => {
 
   const fetchDebts = async () => {
     try {
+      setLoading(true)
       const { data, error } = await supabase
         .from('debts')
         .select('*')
@@ -66,55 +70,56 @@ const DebtManager: React.FC = () => {
       if (error) throw error
       setDebts(data || [])
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message })
+      setError(error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSubmit = async () => {
-    if (!customerName.trim() || !amount) {
-      setMessage({ type: 'error', text: 'Customer name and amount are required' })
-      return
-    }
+  const handleSave = async () => {
+    if (!customerName.trim() || !amount) return
+
+    setLoading(true)
+    setError(null)
 
     try {
       if (editingDebt) {
         const { error } = await supabase
           .from('debts')
           .update({
-            customer_name: customerName,
+            customer_name: customerName.trim(),
             amount: parseFloat(amount),
-            description,
-            due_date: dueDate?.format('YYYY-MM-DD') || null,
+            description: description.trim() || null,
+            due_date: dueDate || null,
           })
           .eq('id', editingDebt.id)
 
         if (error) throw error
-        setMessage({ type: 'success', text: 'Debt updated successfully!' })
       } else {
         const { error } = await supabase
           .from('debts')
           .insert({
-            user_id: user?.id,
-            customer_name: customerName,
+            customer_name: customerName.trim(),
             amount: parseFloat(amount),
-            description,
-            due_date: dueDate?.format('YYYY-MM-DD') || null,
+            description: description.trim() || null,
+            due_date: dueDate || null,
+            user_id: user?.id!,
           })
 
         if (error) throw error
-        setMessage({ type: 'success', text: 'Debt added successfully!' })
       }
 
-      handleClose()
+      setDialogOpen(false)
+      resetForm()
       fetchDebts()
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message })
+      setError(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleMarkPaid = async (debtId: string) => {
+  const handleMarkPaid = async (debt: Debt) => {
     try {
       const { error } = await supabase
         .from('debts')
@@ -122,30 +127,28 @@ const DebtManager: React.FC = () => {
           is_paid: true,
           paid_at: new Date().toISOString(),
         })
-        .eq('id', debtId)
+        .eq('id', debt.id)
 
       if (error) throw error
-      setMessage({ type: 'success', text: 'Debt marked as paid!' })
       fetchDebts()
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message })
+      setError(error.message)
     }
   }
 
-  const handleDelete = async (debtId: string) => {
-    if (window.confirm('Are you sure you want to delete this debt record?')) {
-      try {
-        const { error } = await supabase
-          .from('debts')
-          .delete()
-          .eq('id', debtId)
+  const handleDelete = async (debt: Debt) => {
+    if (!confirm(`Delete debt for ${debt.customer_name}?`)) return
 
-        if (error) throw error
-        setMessage({ type: 'success', text: 'Debt deleted successfully!' })
-        fetchDebts()
-      } catch (error: any) {
-        setMessage({ type: 'error', text: error.message })
-      }
+    try {
+      const { error } = await supabase
+        .from('debts')
+        .delete()
+        .eq('id', debt.id)
+
+      if (error) throw error
+      fetchDebts()
+    } catch (error: any) {
+      setError(error.message)
     }
   }
 
@@ -154,79 +157,91 @@ const DebtManager: React.FC = () => {
     setCustomerName(debt.customer_name)
     setAmount(debt.amount.toString())
     setDescription(debt.description || '')
-    setDueDate(debt.due_date ? dayjs(debt.due_date) : null)
-    setOpen(true)
+    setDueDate(debt.due_date || '')
+    setDialogOpen(true)
   }
 
-  const handleClose = () => {
-    setOpen(false)
+  const resetForm = () => {
     setEditingDebt(null)
     setCustomerName('')
     setAmount('')
     setDescription('')
-    setDueDate(null)
+    setDueDate('')
   }
 
-  const totalDebt = debts.filter(d => !d.is_paid).reduce((sum, debt) => sum + debt.amount, 0)
-  const paidDebt = debts.filter(d => d.is_paid).reduce((sum, debt) => sum + debt.amount, 0)
+  const openNewDialog = () => {
+    resetForm()
+    setDialogOpen(true)
+  }
+
+  const totalOutstanding = debts
+    .filter(debt => !debt.is_paid)
+    .reduce((sum, debt) => sum + debt.amount, 0)
+
+  const totalPaid = debts
+    .filter(debt => debt.is_paid)
+    .reduce((sum, debt) => sum + debt.amount, 0)
+
+  if (loading && debts.length === 0) {
+    return (
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <Typography>Loading debts...</Typography>
+      </Box>
+    )
+  }
 
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant="h5" gutterBottom color="primary">
-        Debt Management
-      </Typography>
-
-      {message && (
-        <Alert severity={message.type} sx={{ mb: 2 }} onClose={() => setMessage(null)}>
-          {message.text}
-        </Alert>
-      )}
-
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
-        <Paper sx={{ p: 2, textAlign: 'center' }}>
-          <Typography variant="h6" color="error">
-            Outstanding Debt
-          </Typography>
-          <Typography variant="h4">
-            KSh {totalDebt.toLocaleString()}
-          </Typography>
-        </Paper>
-        <Paper sx={{ p: 2, textAlign: 'center' }}>
-          <Typography variant="h6" color="success.main">
-            Paid Debt
-          </Typography>
-          <Typography variant="h4">
-            KSh {paidDebt.toLocaleString()}
-          </Typography>
-        </Paper>
-        <Paper sx={{ p: 2, textAlign: 'center' }}>
-          <Typography variant="h6">
-            Total Customers
-          </Typography>
-          <Typography variant="h4">
-            {new Set(debts.map(d => d.customer_name)).size}
-          </Typography>
-        </Paper>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h5" color="primary">
+          Debt Management
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={openNewDialog}
+        >
+          Add Debt
+        </Button>
       </Box>
 
-      <Button
-        variant="contained"
-        startIcon={<Add />}
-        onClick={() => setOpen(true)}
-        sx={{ mb: 2 }}
-      >
-        Add New Debt
-      </Button>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Outstanding Debt
+              </Typography>
+              <Typography variant="h4" color="error">
+                KSh {totalOutstanding.toLocaleString()}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Total Collected
+              </Typography>
+              <Typography variant="h4" color="success.main">
+                KSh {totalPaid.toLocaleString()}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Customer Name</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Due Date</TableCell>
+              <TableCell>Customer</TableCell>
+              <TableCell>Amount (KSh)</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Due Date</TableCell>
               <TableCell>Created</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -235,11 +250,7 @@ const DebtManager: React.FC = () => {
             {debts.map((debt) => (
               <TableRow key={debt.id}>
                 <TableCell>{debt.customer_name}</TableCell>
-                <TableCell>KSh {debt.amount.toLocaleString()}</TableCell>
-                <TableCell>{debt.description || '-'}</TableCell>
-                <TableCell>
-                  {debt.due_date ? dayjs(debt.due_date).format('MMM DD, YYYY') : '-'}
-                </TableCell>
+                <TableCell>{debt.amount.toLocaleString()}</TableCell>
                 <TableCell>
                   <Chip
                     label={debt.is_paid ? 'Paid' : 'Outstanding'}
@@ -248,39 +259,43 @@ const DebtManager: React.FC = () => {
                   />
                 </TableCell>
                 <TableCell>
+                  {debt.due_date ? dayjs(debt.due_date).format('MMM DD, YYYY') : 'No due date'}
+                </TableCell>
+                <TableCell>
                   {dayjs(debt.created_at).format('MMM DD, YYYY')}
                 </TableCell>
                 <TableCell>
                   {!debt.is_paid && (
                     <IconButton
-                      onClick={() => handleMarkPaid(debt.id)}
+                      size="small"
+                      onClick={() => handleMarkPaid(debt)}
                       color="success"
                       title="Mark as Paid"
                     >
-                      <Check />
+                      <CheckCircle fontSize="small" />
                     </IconButton>
                   )}
                   <IconButton
+                    size="small"
                     onClick={() => handleEdit(debt)}
                     color="primary"
-                    title="Edit"
                   >
-                    <Edit />
+                    <Edit fontSize="small" />
                   </IconButton>
                   <IconButton
-                    onClick={() => handleDelete(debt.id)}
+                    size="small"
+                    onClick={() => handleDelete(debt)}
                     color="error"
-                    title="Delete"
                   >
-                    <Delete />
+                    <Delete fontSize="small" />
                   </IconButton>
                 </TableCell>
               </TableRow>
             ))}
             {debts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} sx={{ textAlign: 'center', py: 3 }}>
-                  No debt records found
+                <TableCell colSpan={6} align="center">
+                  No debts recorded yet
                 </TableCell>
               </TableRow>
             )}
@@ -288,48 +303,57 @@ const DebtManager: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
           {editingDebt ? 'Edit Debt' : 'Add New Debt'}
         </DialogTitle>
         <DialogContent>
           <TextField
-            fullWidth
+            autoFocus
+            margin="dense"
             label="Customer Name"
+            fullWidth
+            variant="outlined"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
-            margin="normal"
             required
           />
           <TextField
-            fullWidth
+            margin="dense"
             label="Amount (KSh)"
             type="number"
+            fullWidth
+            variant="outlined"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            margin="normal"
             required
+            inputProps={{ min: 0, step: 0.01 }}
           />
           <TextField
-            fullWidth
+            margin="dense"
             label="Description (Optional)"
+            fullWidth
+            variant="outlined"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            margin="normal"
             multiline
             rows={2}
           />
-          <DatePicker
+          <TextField
+            margin="dense"
             label="Due Date (Optional)"
+            type="date"
+            fullWidth
+            variant="outlined"
             value={dueDate}
-            onChange={setDueDate}
-            sx={{ mt: 2, width: '100%' }}
+            onChange={(e) => setDueDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            {editingDebt ? 'Update' : 'Add'} Debt
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSave} variant="contained" disabled={loading || !customerName.trim() || !amount}>
+            {loading ? 'Saving...' : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>

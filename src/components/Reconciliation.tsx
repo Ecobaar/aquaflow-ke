@@ -4,245 +4,261 @@ import {
   Box,
   Paper,
   Typography,
-  TextField,
-  Button,
+  Grid,
   Card,
   CardContent,
+  Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Alert,
   Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
 } from '@mui/material'
+import { AccountBalanceWallet, TrendingUp, TrendingDown } from '@mui/icons-material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { Balance, Warning, CheckCircle } from '@mui/icons-material'
-import dayjs, { Dayjs } from 'dayjs'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
+import dayjs, { Dayjs } from 'dayjs'
 
-interface DailySummary {
-  date: string
-  cash_total: number
-  till_total: number
-  total_sales: number
+interface ReconciliationData {
+  totalSales: number
+  cashSales: number
+  tillSales: number
+  debtSales: number
+  totalExpenses: number
+  netProfit: number
+  outstandingDebt: number
 }
 
 const Reconciliation: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs())
-  const [actualCash, setActualCash] = useState('')
-  const [actualTill, setActualTill] = useState('')
-  const [dailySummary, setDailySummary] = useState<DailySummary | null>(null)
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().startOf('month'))
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
+  const [data, setData] = useState<ReconciliationData | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const { user } = useAuth()
 
-  useEffect(() => {
-    if (user && selectedDate) {
-      fetchDailySummary()
-    }
-  }, [user, selectedDate])
+  const fetchReconciliationData = async () => {
+    if (!startDate || !endDate || !user) return
 
-  const fetchDailySummary = async () => {
+    setLoading(true)
+    setError(null)
+
     try {
-      setLoading(true)
-      const dateStr = selectedDate.format('YYYY-MM-DD')
-      
-      const { data, error } = await supabase
-        .from('daily_summaries')
-        .select('*')
-        .eq('user_id', user?.id)
-        .eq('date', dateStr)
-        .single()
+      const start = startDate.startOf('day').toISOString()
+      const end = endDate.endOf('day').toISOString()
 
-      if (error && error.code !== 'PGRST116') throw error
-      setDailySummary(data)
+      // Fetch transactions
+      const { data: transactions, error: transError } = await supabase
+        .from('transactions')
+        .select('amount, payment_method')
+        .eq('user_id', user.id)
+        .gte('created_at', start)
+        .lte('created_at', end)
+
+      if (transError) throw transError
+
+      // Fetch expenses
+      const { data: expenses, error: expError } = await supabase
+        .from('expenses')
+        .select('amount')
+        .eq('user_id', user.id)
+        .gte('created_at', start)
+        .lte('created_at', end)
+
+      if (expError) throw expError
+
+      // Fetch outstanding debts
+      const { data: debts, error: debtError } = await supabase
+        .from('debts')
+        .select('amount')
+        .eq('user_id', user.id)
+        .eq('is_paid', false)
+
+      if (debtError) throw debtError
+
+      // Calculate totals
+      const totalSales = transactions?.reduce((sum, t) => sum + t.amount, 0) || 0
+      const cashSales = transactions?.filter(t => t.payment_method === 'cash').reduce((sum, t) => sum + t.amount, 0) || 0
+      const tillSales = transactions?.filter(t => t.payment_method === 'till').reduce((sum, t) => sum + t.amount, 0) || 0
+      const debtSales = transactions?.filter(t => t.payment_method === 'debt').reduce((sum, t) => sum + t.amount, 0) || 0
+      const totalExpenses = expenses?.reduce((sum, e) => sum + e.amount, 0) || 0
+      const outstandingDebt = debts?.reduce((sum, d) => sum + d.amount, 0) || 0
+      const netProfit = totalSales - totalExpenses
+
+      setData({
+        totalSales,
+        cashSales,
+        tillSales,
+        debtSales,
+        totalExpenses,
+        netProfit,
+        outstandingDebt,
+      })
     } catch (error: any) {
-      console.error('Error fetching daily summary:', error)
+      setError(error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: 'KES',
-    }).format(amount)
-  }
+  useEffect(() => {
+    if (user && startDate && endDate) {
+      fetchReconciliationData()
+    }
+  }, [user])
 
-  const expectedCash = dailySummary ? Number(dailySummary.cash_total) : 0
-  const expectedTill = dailySummary ? Number(dailySummary.till_total) : 0
-  const actualCashNum = parseFloat(actualCash) || 0
-  const actualTillNum = parseFloat(actualTill) || 0
-
-  const cashDifference = actualCashNum - expectedCash
-  const tillDifference = actualTillNum - expectedTill
-  const totalDifference = cashDifference + tillDifference
-
-  const getStatusIcon = (difference: number) => {
-    if (Math.abs(difference) < 0.01) return <CheckCircle color="success" />
-    return <Warning color="warning" />
+  const handleReconcile = () => {
+    fetchReconciliationData()
   }
 
   return (
-    <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
-      <Typography variant="h5" gutterBottom color="primary">
-        Cash Reconciliation
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h5" gutterBottom color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <AccountBalanceWallet />
+        Daily Reconciliation
       </Typography>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          <strong>What is Reconciliation?</strong><br />
-          Reconciliation helps you verify that your actual cash and till amounts match your expected sales totals. 
-          This process helps identify discrepancies, missing transactions, or errors in your daily sales recording.
-        </Typography>
-      </Alert>
-
-      <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
-        <Box sx={{ flex: 1 }}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Select Date & Enter Actual Amounts
-            </Typography>
-            
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Grid container spacing={3} alignItems="center">
+          <Grid item xs={12} md={4}>
             <DatePicker
-              label="Reconciliation Date"
-              value={selectedDate}
-              onChange={(newValue) => newValue && setSelectedDate(newValue)}
-              sx={{ mb: 2, width: '100%' }}
+              label="Start Date"
+              value={startDate}
+              onChange={setStartDate}
+              slotProps={{ textField: { fullWidth: true } }}
             />
-
-            <TextField
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={setEndDate}
+              slotProps={{ textField: { fullWidth: true } }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Button
               fullWidth
-              label="Actual Cash Amount (KSh)"
-              type="number"
-              value={actualCash}
-              onChange={(e) => setActualCash(e.target.value)}
-              margin="normal"
-              inputProps={{ min: 0, step: 0.01 }}
-            />
-
-            <TextField
-              fullWidth
-              label="Actual Till Amount (KSh)"
-              type="number"
-              value={actualTill}
-              onChange={(e) => setActualTill(e.target.value)}
-              margin="normal"
-              inputProps={{ min: 0, step: 0.01 }}
-            />
-          </Paper>
-        </Box>
-
-        <Box sx={{ flex: 1 }}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Expected vs Actual
-            </Typography>
-
-            {dailySummary ? (
-              <Box>
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Payment Method</TableCell>
-                        <TableCell align="right">Expected</TableCell>
-                        <TableCell align="right">Actual</TableCell>
-                        <TableCell align="right">Difference</TableCell>
-                        <TableCell align="center">Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>Cash</TableCell>
-                        <TableCell align="right">{formatCurrency(expectedCash)}</TableCell>
-                        <TableCell align="right">{formatCurrency(actualCashNum)}</TableCell>
-                        <TableCell align="right">
-                          <Typography color={cashDifference >= 0 ? 'success.main' : 'error.main'}>
-                            {cashDifference >= 0 ? '+' : ''}{formatCurrency(cashDifference)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          {getStatusIcon(cashDifference)}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Till</TableCell>
-                        <TableCell align="right">{formatCurrency(expectedTill)}</TableCell>
-                        <TableCell align="right">{formatCurrency(actualTillNum)}</TableCell>
-                        <TableCell align="right">
-                          <Typography color={tillDifference >= 0 ? 'success.main' : 'error.main'}>
-                            {tillDifference >= 0 ? '+' : ''}{formatCurrency(tillDifference)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          {getStatusIcon(tillDifference)}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-                <Divider sx={{ my: 2 }} />
-
-                <Card variant="outlined">
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <Balance sx={{ mr: 1 }} />
-                      <Typography variant="h6">
-                        Total Reconciliation
-                      </Typography>
-                    </Box>
-                    <Typography variant="h4" color={totalDifference >= 0 ? 'success.main' : 'error.main'}>
-                      {totalDifference >= 0 ? '+' : ''}{formatCurrency(totalDifference)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {Math.abs(totalDifference) < 0.01 
-                        ? '✅ Perfect match! Your records are accurate.'
-                        : totalDifference > 0 
-                        ? '⚠️ You have more cash than expected. Check for unrecorded sales.'
-                        : '⚠️ You have less cash than expected. Check for missing transactions or errors.'
-                      }
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Box>
-            ) : (
-              <Alert severity="info">
-                No sales data found for {selectedDate.format('MMM DD, YYYY')}. 
-                Make sure you have recorded sales for this date.
-              </Alert>
-            )}
-          </Paper>
-        </Box>
-      </Box>
-
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Reconciliation Tips
-        </Typography>
-        <Box component="ul" sx={{ pl: 2 }}>
-          <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-            Count your actual cash and till amounts at the end of each business day
-          </Typography>
-          <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-            Compare with your expected amounts from recorded sales
-          </Typography>
-          <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-            Investigate any discrepancies - they might indicate missing transactions or errors
-          </Typography>
-          <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-            Regular reconciliation helps maintain accurate financial records
-          </Typography>
-          <Typography component="li" variant="body2">
-            Keep reconciliation records for audit purposes and business analysis
-          </Typography>
-        </Box>
+              variant="contained"
+              size="large"
+              onClick={handleReconcile}
+              disabled={loading || !startDate || !endDate}
+            >
+              {loading ? 'Processing...' : 'Reconcile'}
+            </Button>
+          </Grid>
+        </Grid>
       </Paper>
+
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+
+      {data && (
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom>
+                  Total Sales
+                </Typography>
+                <Typography variant="h4" color="primary">
+                  KSh {data.totalSales.toLocaleString()}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="textSecondary">Cash</Typography>
+                    <Typography variant="h6">KSh {data.cashSales.toLocaleString()}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="textSecondary">Till</Typography>
+                    <Typography variant="h6">KSh {data.tillSales.toLocaleString()}</Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom>
+                  Total Expenses
+                </Typography>
+                <Typography variant="h4" color="error">
+                  KSh {data.totalExpenses.toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {data.netProfit >= 0 ? <TrendingUp color="success" /> : <TrendingDown color="error" />}
+                  Net Profit/Loss
+                </Typography>
+                <Typography 
+                  variant="h4" 
+                  color={data.netProfit >= 0 ? "success.main" : "error"}
+                >
+                  KSh {data.netProfit.toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom>
+                  Outstanding Debt
+                </Typography>
+                <Typography variant="h4" color="warning.main">
+                  KSh {data.outstandingDebt.toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom color="primary">
+                  Summary for {startDate?.format('MMM DD')} - {endDate?.format('MMM DD, YYYY')}
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={3}>
+                    <Typography variant="body2" color="textSecondary">Cash Sales</Typography>
+                    <Typography variant="h6">KSh {data.cashSales.toLocaleString()}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <Typography variant="body2" color="textSecondary">Till Sales</Typography>
+                    <Typography variant="h6">KSh {data.tillSales.toLocaleString()}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <Typography variant="body2" color="textSecondary">Debt Sales</Typography>
+                    <Typography variant="h6">KSh {data.debtSales.toLocaleString()}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <Typography variant="body2" color="textSecondary">Cash Flow</Typography>
+                    <Typography 
+                      variant="h6" 
+                      color={data.cashSales + data.tillSales - data.totalExpenses >= 0 ? "success.main" : "error"}
+                    >
+                      KSh {(data.cashSales + data.tillSales - data.totalExpenses).toLocaleString()}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
     </Box>
   )
 }
