@@ -6,7 +6,7 @@ import {
   TextField,
   Button,
   Typography,
-  Grid2 as Grid,
+  Grid,
   Card,
   CardContent,
 } from '@mui/material'

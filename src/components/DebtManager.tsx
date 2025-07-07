@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -21,7 +20,7 @@ import {
   Alert,
   Card,
   CardContent,
-  Grid2 as Grid,
+  Grid,
 } from '@mui/material'
 import { Add, Edit, Delete, CheckCircle, MoneyOff } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
