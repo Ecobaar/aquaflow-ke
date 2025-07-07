@@ -14,7 +14,7 @@ import {
   Switch,
   FormControlLabel,
 } from '@mui/material'
-import { supabase } from '../lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
 
 interface Customer {
@@ -72,7 +72,7 @@ const Sales: React.FC = () => {
         .insert({
           amount: parseFloat(amount),
           payment_method: paymentMethod,
-          customer_id: customerId || null,
+          customer_id: customerId ? parseInt(customerId) : null,
           customer_name: selectedCustomer?.name || null,
           paid_status: paymentMethod === 'debt' ? false : paidStatus,
           user_id: user?.id!,

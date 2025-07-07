@@ -18,11 +18,11 @@ import {
   Alert,
 } from '@mui/material'
 import { Edit, Delete, Add } from '@mui/icons-material'
-import { supabase } from '../lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
 
 interface Customer {
-  id: string
+  id: number
   name: string
   phone: string | null
   created_at: string

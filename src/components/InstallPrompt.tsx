@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -11,8 +11,20 @@ import { GetApp, Close } from '@mui/icons-material'
 import { usePWA } from '../hooks/usePWA'
 
 const InstallPrompt: React.FC = () => {
-  const { isInstallable, installApp } = usePWA()
-  const [showPrompt, setShowPrompt] = useState(true)
+  const { isInstallable, isInstalled, installApp } = usePWA()
+  const [showPrompt, setShowPrompt] = useState(false)
+
+  useEffect(() => {
+    // Show prompt only if installable and not already installed
+    if (isInstallable && !isInstalled) {
+      // Wait a bit before showing the prompt to not be intrusive
+      const timer = setTimeout(() => {
+        setShowPrompt(true)
+      }, 3000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [isInstallable, isInstalled])
 
   const handleInstall = async () => {
     const success = await installApp()
@@ -21,7 +33,8 @@ const InstallPrompt: React.FC = () => {
     }
   }
 
-  if (!isInstallable || !showPrompt) {
+  // Don't show if not installable, already installed, or user dismissed
+  if (!isInstallable || isInstalled || !showPrompt) {
     return null
   }
 
@@ -53,7 +66,7 @@ const InstallPrompt: React.FC = () => {
           </Box>
         }
       >
-        Install AquaFlow for offline access!
+        Install AquaFlow for offline access and better performance!
       </Alert>
     </Snackbar>
   )

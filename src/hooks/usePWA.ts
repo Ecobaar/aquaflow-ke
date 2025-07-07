@@ -18,19 +18,23 @@ export const usePWA = () => {
   useEffect(() => {
     // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration)
-        })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError)
-        })
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration)
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError)
+          })
+      })
     }
 
     // Check if app is already installed
     const checkIfInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches) {
+      if (window.matchMedia('(display-mode: standalone)').matches || 
+          (window.navigator as any).standalone === true) {
         setIsInstalled(true)
+        setIsInstallable(false)
       }
     }
 
@@ -38,6 +42,7 @@ export const usePWA = () => {
 
     // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event fired')
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       setIsInstallable(true)
@@ -45,6 +50,7 @@ export const usePWA = () => {
 
     // Listen for appinstalled event
     const handleAppInstalled = () => {
+      console.log('PWA was installed')
       setIsInstalled(true)
       setIsInstallable(false)
       setDeferredPrompt(null)
@@ -60,11 +66,15 @@ export const usePWA = () => {
   }, [])
 
   const installApp = async () => {
-    if (!deferredPrompt) return false
+    if (!deferredPrompt) {
+      console.log('No deferred prompt available')
+      return false
+    }
 
     try {
       await deferredPrompt.prompt()
       const { outcome } = await deferredPrompt.userChoice
+      console.log(`User response to the install prompt: ${outcome}`)
       
       if (outcome === 'accepted') {
         setDeferredPrompt(null)
