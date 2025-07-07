@@ -19,7 +19,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Grid,
 } from '@mui/material'
 import { Add, Edit, Delete, Check, AttachMoney } from '@mui/icons-material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
@@ -183,38 +182,32 @@ const DebtManager: React.FC = () => {
         </Alert>
       )}
 
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6" color="error">
-              Outstanding Debt
-            </Typography>
-            <Typography variant="h4">
-              KSh {totalDebt.toLocaleString()}
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6" color="success.main">
-              Paid Debt
-            </Typography>
-            <Typography variant="h4">
-              KSh {paidDebt.toLocaleString()}
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6">
-              Total Customers
-            </Typography>
-            <Typography variant="h4">
-              {new Set(debts.map(d => d.customer_name)).size}
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+        <Paper sx={{ p: 2, textAlign: 'center' }}>
+          <Typography variant="h6" color="error">
+            Outstanding Debt
+          </Typography>
+          <Typography variant="h4">
+            KSh {totalDebt.toLocaleString()}
+          </Typography>
+        </Paper>
+        <Paper sx={{ p: 2, textAlign: 'center' }}>
+          <Typography variant="h6" color="success.main">
+            Paid Debt
+          </Typography>
+          <Typography variant="h4">
+            KSh {paidDebt.toLocaleString()}
+          </Typography>
+        </Paper>
+        <Paper sx={{ p: 2, textAlign: 'center' }}>
+          <Typography variant="h6">
+            Total Customers
+          </Typography>
+          <Typography variant="h4">
+            {new Set(debts.map(d => d.customer_name)).size}
+          </Typography>
+        </Paper>
+      </Box>
 
       <Button
         variant="contained"

@@ -18,7 +18,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Grid,
   Card,
   CardContent,
 } from '@mui/material'
@@ -163,44 +162,38 @@ const Expenses: React.FC = () => {
         </Alert>
       )}
 
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Today's Expenses
-              </Typography>
-              <Typography variant="h5" color="error">
-                KSh {todayExpenses.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                This Month
-              </Typography>
-              <Typography variant="h5" color="warning.main">
-                KSh {thisMonthExpenses.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Expenses
-              </Typography>
-              <Typography variant="h5">
-                KSh {totalExpenses.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Today's Expenses
+            </Typography>
+            <Typography variant="h5" color="error">
+              KSh {todayExpenses.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              This Month
+            </Typography>
+            <Typography variant="h5" color="warning.main">
+              KSh {thisMonthExpenses.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Total Expenses
+            </Typography>
+            <Typography variant="h5">
+              KSh {totalExpenses.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       <Button
         variant="contained"

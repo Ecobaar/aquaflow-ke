@@ -4,7 +4,6 @@ import {
   Box,
   Paper,
   Typography,
-  Grid,
   Card,
   CardContent,
   FormControl,
@@ -162,122 +161,108 @@ const Analytics: React.FC = () => {
       </Box>
 
       {/* Summary Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Sales
-              </Typography>
-              <Typography variant="h5" color="primary">
-                KSh {totalSales.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Expenses
-              </Typography>
-              <Typography variant="h5" color="error">
-                KSh {totalExpenses.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Net Profit
-              </Typography>
-              <Typography variant="h5" color={netProfit >= 0 ? "success.main" : "error"}>
-                KSh {netProfit.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Outstanding Debt
-              </Typography>
-              <Typography variant="h5" color="warning.main">
-                KSh {totalDebt.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Total Sales
+            </Typography>
+            <Typography variant="h5" color="primary">
+              KSh {totalSales.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Total Expenses
+            </Typography>
+            <Typography variant="h5" color="error">
+              KSh {totalExpenses.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Net Profit
+            </Typography>
+            <Typography variant="h5" color={netProfit >= 0 ? "success.main" : "error"}>
+              KSh {netProfit.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="textSecondary" gutterBottom>
+              Outstanding Debt
+            </Typography>
+            <Typography variant="h5" color="warning.main">
+              KSh {totalDebt.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Charts */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Sales Trend
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={salesTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={(value) => `KSh ${value}`} />
-                <Legend />
-                <Line type="monotone" dataKey="sales" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 3, mb: 3 }}>
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Sales Trend
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={salesTrendData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip formatter={(value) => `KSh ${value}`} />
+              <Legend />
+              <Line type="monotone" dataKey="sales" stroke="#8884d8" />
+            </LineChart>
+          </ResponsiveContainer>
+        </Paper>
 
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Payment Methods
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `KSh ${value}`} />
-              </PieChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Payment Methods
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `KSh ${value}`} />
+            </PieChart>
+          </ResponsiveContainer>
+        </Paper>
+      </Box>
 
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Top Debtors
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={topDebtorsData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip formatter={(value) => `KSh ${value}`} />
-                <Legend />
-                <Bar dataKey="amount" fill="#ff8042" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
-      </Grid>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Top Debtors
+        </Typography>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={topDebtorsData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip formatter={(value) => `KSh ${value}`} />
+            <Legend />
+            <Bar dataKey="amount" fill="#ff8042" />
+          </BarChart>
+        </ResponsiveContainer>
+      </Paper>
     </Box>
   )
 }
