@@ -18,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
 
 interface Customer {
-  id: string
+  id: number
   name: string
 }
 
@@ -65,7 +65,7 @@ const Sales: React.FC = () => {
     setSuccess(null)
 
     try {
-      const selectedCustomer = customers.find(c => c.id === customerId)
+      const selectedCustomer = customers.find(c => c.id === parseInt(customerId))
       
       const { error } = await supabase
         .from('transactions')
@@ -137,7 +137,7 @@ const Sales: React.FC = () => {
             >
               <MenuItem value="">None</MenuItem>
               {customers.map((customer) => (
-                <MenuItem key={customer.id} value={customer.id}>
+                <MenuItem key={customer.id} value={customer.id.toString()}>
                   {customer.name}
                 </MenuItem>
               ))}

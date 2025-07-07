@@ -25,7 +25,7 @@ interface Customer {
   id: number
   name: string
   phone: string | null
-  created_at: string
+  created_at?: string
 }
 
 const CustomerManager: React.FC = () => {
