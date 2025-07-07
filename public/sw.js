@@ -1,9 +1,9 @@
 
-const CACHE_NAME = 'aquaflow-v2';
+const CACHE_NAME = 'aquaflow254-v3';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/favicon.ico'
+  '/lovable-uploads/cde5bb31-4d0f-4901-8d9c-63a2c6ea2842.png'
 ];
 
 // Install event
