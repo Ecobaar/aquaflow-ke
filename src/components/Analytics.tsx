@@ -4,7 +4,7 @@ import {
   Box,
   Paper,
   Typography,
-  Grid,
+  Grid2 as Grid,
   Card,
   CardContent,
   FormControl,
@@ -163,7 +163,7 @@ const Analytics: React.FC = () => {
 
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
@@ -175,7 +175,7 @@ const Analytics: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
@@ -187,7 +187,7 @@ const Analytics: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
@@ -199,7 +199,7 @@ const Analytics: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
@@ -215,7 +215,7 @@ const Analytics: React.FC = () => {
 
       {/* Charts */}
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid xs={12} md={8}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Sales Trend
@@ -233,7 +233,7 @@ const Analytics: React.FC = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid xs={12} md={4}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Payment Methods
@@ -260,7 +260,7 @@ const Analytics: React.FC = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Top Debtors

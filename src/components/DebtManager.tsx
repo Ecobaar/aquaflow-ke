@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Grid,
+  Grid2 as Grid,
 } from '@mui/material'
 import { Add, Edit, Delete, Check, AttachMoney } from '@mui/icons-material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
@@ -184,7 +184,7 @@ const DebtManager: React.FC = () => {
       )}
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h6" color="error">
               Outstanding Debt
@@ -194,7 +194,7 @@ const DebtManager: React.FC = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h6" color="success.main">
               Paid Debt
@@ -204,7 +204,7 @@ const DebtManager: React.FC = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
             <Typography variant="h6">
               Total Customers
