@@ -50,7 +50,7 @@ const Calculator: React.FC = () => {
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={3}>
-          <Grid xs={12}>
+          <Grid size={12}>
             <TextField
               fullWidth
               label="Price per Liter (KSh)"
@@ -61,7 +61,7 @@ const Calculator: React.FC = () => {
             />
           </Grid>
 
-          <Grid xs={12}>
+          <Grid size={12}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Button
                 variant="outlined"
@@ -91,7 +91,7 @@ const Calculator: React.FC = () => {
             </Box>
           </Grid>
 
-          <Grid xs={12}>
+          <Grid size={12}>
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
                 variant="contained"

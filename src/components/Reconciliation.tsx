@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -118,7 +119,7 @@ const Reconciliation: React.FC = () => {
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={3} alignItems="center">
-          <Grid xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <DatePicker
               label="Start Date"
               value={startDate}
@@ -126,7 +127,7 @@ const Reconciliation: React.FC = () => {
               slotProps={{ textField: { fullWidth: true } }}
             />
           </Grid>
-          <Grid xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <DatePicker
               label="End Date"
               value={endDate}
@@ -134,7 +135,7 @@ const Reconciliation: React.FC = () => {
               slotProps={{ textField: { fullWidth: true } }}
             />
           </Grid>
-          <Grid xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Button
               fullWidth
               variant="contained"
@@ -152,7 +153,7 @@ const Reconciliation: React.FC = () => {
 
       {data && (
         <Grid container spacing={3}>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography color="textSecondary" gutterBottom>
@@ -163,11 +164,11 @@ const Reconciliation: React.FC = () => {
                 </Typography>
                 <Divider sx={{ my: 2 }} />
                 <Grid container spacing={2}>
-                  <Grid xs={6}>
+                  <Grid size={6}>
                     <Typography variant="body2" color="textSecondary">Cash</Typography>
                     <Typography variant="h6">KSh {data.cashSales.toLocaleString()}</Typography>
                   </Grid>
-                  <Grid xs={6}>
+                  <Grid size={6}>
                     <Typography variant="body2" color="textSecondary">Till</Typography>
                     <Typography variant="h6">KSh {data.tillSales.toLocaleString()}</Typography>
                   </Grid>
@@ -176,7 +177,7 @@ const Reconciliation: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography color="textSecondary" gutterBottom>
@@ -189,7 +190,7 @@ const Reconciliation: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -206,7 +207,7 @@ const Reconciliation: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography color="textSecondary" gutterBottom>
@@ -219,26 +220,26 @@ const Reconciliation: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid xs={12}>
+          <Grid size={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom color="primary">
                   Summary for {startDate?.format('MMM DD')} - {endDate?.format('MMM DD, YYYY')}
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid xs={12} md={3}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <Typography variant="body2" color="textSecondary">Cash Sales</Typography>
                     <Typography variant="h6">KSh {data.cashSales.toLocaleString()}</Typography>
                   </Grid>
-                  <Grid xs={12} md={3}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <Typography variant="body2" color="textSecondary">Till Sales</Typography>
                     <Typography variant="h6">KSh {data.tillSales.toLocaleString()}</Typography>
                   </Grid>
-                  <Grid xs={12} md={3}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <Typography variant="body2" color="textSecondary">Debt Sales</Typography>
                     <Typography variant="h6">KSh {data.debtSales.toLocaleString()}</Typography>
                   </Grid>
-                  <Grid xs={12} md={3}>
+                  <Grid size={{ xs: 12, md: 3 }}>
                     <Typography variant="body2" color="textSecondary">Cash Flow</Typography>
                     <Typography 
                       variant="h6" 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -207,7 +208,7 @@ const DebtManager: React.FC = () => {
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
@@ -219,7 +220,7 @@ const DebtManager: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>

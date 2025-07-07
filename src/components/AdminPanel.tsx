@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -59,18 +60,15 @@ const AdminPanel: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      // Note: In a real app, you'd need admin permissions to fetch all users
-      // This is a simplified version for demonstration
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('id, station_name, created_at')
 
       if (error) throw error
 
-      // Get user emails from auth (requires admin access)
       const usersWithProfiles = profiles?.map(profile => ({
         id: profile.id,
-        email: 'user@example.com', // Placeholder - would need admin API
+        email: 'user@example.com',
         created_at: profile.created_at,
         station_name: profile.station_name,
       })) || []
@@ -149,7 +147,7 @@ const AdminPanel: React.FC = () => {
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -162,7 +160,7 @@ const AdminPanel: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -175,7 +173,7 @@ const AdminPanel: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
