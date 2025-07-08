@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react'
 import {
   Box,
@@ -11,7 +12,7 @@ import {
   Alert,
   Divider,
 } from '@mui/material'
-import { Calculate, Save, History } from '@mui/icons-material'
+import { Calculate, Save } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -23,6 +24,7 @@ const Calculator: React.FC = () => {
   const [tillTotal, setTillTotal] = useState<number>(0)
   const [debtTotal, setDebtTotal] = useState<number>(0)
   const [grandTotal, setGrandTotal] = useState<number>(0)
+  const [litersBreakdown, setLitersBreakdown] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
@@ -58,7 +60,21 @@ const Calculator: React.FC = () => {
     }
   }
 
-  const handleCalculate = () => {
+  const calculateLiters = async (amount: number) => {
+    try {
+      const { data, error } = await supabase.rpc('calculate_liters_from_amount', {
+        amount: amount
+      })
+      
+      if (error) throw error
+      return data
+    } catch (error) {
+      console.error('Error calculating liters:', error)
+      return null
+    }
+  }
+
+  const handleCalculate = async () => {
     const cash = calculateAmount(cashInput)
     const till = calculateAmount(tillInput)
     const debt = calculateAmount(debtInput)
@@ -68,6 +84,15 @@ const Calculator: React.FC = () => {
     setTillTotal(till)
     setDebtTotal(debt)
     setGrandTotal(total)
+    
+    // Calculate total liters sold
+    if (total > 0) {
+      const liters = await calculateLiters(total)
+      setLitersBreakdown(liters)
+    } else {
+      setLitersBreakdown(null)
+    }
+    
     setMessage(null)
   }
 
@@ -100,17 +125,20 @@ const Calculator: React.FC = () => {
         throw fetchError
       }
 
+      const summaryData = {
+        cash_total: cashTotal,
+        till_total: tillTotal,
+        debt_total: debtTotal,
+        total_sales: grandTotal,
+        liters_sold: litersBreakdown,
+        updated_at: new Date().toISOString()
+      }
+
       if (existingRecord) {
         // Update existing record
         const { error: updateError } = await supabase
           .from('daily_summaries')
-          .update({
-            cash_total: cashTotal,
-            till_total: tillTotal,
-            debt_total: debtTotal,
-            total_sales: grandTotal,
-            updated_at: new Date().toISOString()
-          })
+          .update(summaryData)
           .eq('id', existingRecord.id)
 
         if (updateError) throw updateError
@@ -122,57 +150,11 @@ const Calculator: React.FC = () => {
           .insert({
             user_id: user.id,
             date: today,
-            cash_total: cashTotal,
-            till_total: tillTotal,
-            debt_total: debtTotal,
-            total_sales: grandTotal
+            ...summaryData
           })
 
         if (insertError) throw insertError
         setMessage({ type: 'success', text: 'Daily summary saved successfully!' })
-      }
-
-      // Also create individual transactions for record keeping
-      const transactions = []
-      
-      if (cashTotal > 0) {
-        transactions.push({
-          user_id: user.id,
-          amount: cashTotal,
-          payment_method: 'cash',
-          description: `Daily cash total: ${cashInput}`,
-          customer_name: 'Daily Summary'
-        })
-      }
-      
-      if (tillTotal > 0) {
-        transactions.push({
-          user_id: user.id,
-          amount: tillTotal,
-          payment_method: 'till',
-          description: `Daily till total: ${tillInput}`,
-          customer_name: 'Daily Summary'
-        })
-      }
-      
-      if (debtTotal > 0) {
-        transactions.push({
-          user_id: user.id,
-          amount: debtTotal,
-          payment_method: 'debt',
-          description: `Daily debt total: ${debtInput}`,
-          customer_name: 'Daily Summary'
-        })
-      }
-
-      if (transactions.length > 0) {
-        const { error: transactionError } = await supabase
-          .from('transactions')
-          .insert(transactions)
-
-        if (transactionError) {
-          console.error('Transaction insertion error:', transactionError)
-        }
       }
 
     } catch (error: any) {
@@ -191,6 +173,7 @@ const Calculator: React.FC = () => {
     setTillTotal(0)
     setDebtTotal(0)
     setGrandTotal(0)
+    setLitersBreakdown(null)
     setMessage(null)
   }
 
@@ -216,7 +199,7 @@ const Calculator: React.FC = () => {
               value={cashInput}
               onChange={(e) => setCashInput(e.target.value)}
               placeholder="e.g., 1000+500 or 1000,500,200"
-              helperText="Separate amounts with commas or use + - * /"
+              helperText="200=20L, 100=10L, 50=5L, 10=1L, 5=0.5L"
             />
           </Grid>
 
@@ -227,7 +210,7 @@ const Calculator: React.FC = () => {
               value={tillInput}
               onChange={(e) => setTillInput(e.target.value)}
               placeholder="e.g., 2000+1500 or 2000,1500,800"
-              helperText="Separate amounts with commas or use + - * /"
+              helperText="200=20L, 100=10L, 50=5L, 10=1L, 5=0.5L"
             />
           </Grid>
 
@@ -238,7 +221,7 @@ const Calculator: React.FC = () => {
               value={debtInput}
               onChange={(e) => setDebtInput(e.target.value)}
               placeholder="e.g., 500+300 or 500,300,200"
-              helperText="Separate amounts with commas or use + - * /"
+              helperText="200=20L, 100=10L, 50=5L, 10=1L, 5=0.5L"
             />
           </Grid>
 
@@ -340,45 +323,56 @@ const Calculator: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid size={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom color="primary">
-                  Calculation Breakdown
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography variant="body2" color="textSecondary">Cash Input</Typography>
-                    <Typography variant="body1" sx={{ fontFamily: 'monospace', mb: 1 }}>
-                      {cashInput || 'No input'}
-                    </Typography>
-                    <Typography variant="body2" color="success.main">
-                      = KSh {cashTotal.toLocaleString()}
-                    </Typography>
+          {litersBreakdown && (
+            <Grid size={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom color="primary">
+                    Water Sales Breakdown
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 6, md: 2 }}>
+                      <Typography variant="body2" color="textSecondary">20L Containers</Typography>
+                      <Typography variant="h6" color="primary">
+                        {litersBreakdown['20L']} pcs
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, md: 2 }}>
+                      <Typography variant="body2" color="textSecondary">10L Containers</Typography>
+                      <Typography variant="h6" color="primary">
+                        {litersBreakdown['10L']} pcs
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, md: 2 }}>
+                      <Typography variant="body2" color="textSecondary">5L Containers</Typography>
+                      <Typography variant="h6" color="primary">
+                        {litersBreakdown['5L']} pcs
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, md: 2 }}>
+                      <Typography variant="body2" color="textSecondary">1L Bottles</Typography>
+                      <Typography variant="h6" color="primary">
+                        {litersBreakdown['1L']} pcs
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, md: 2 }}>
+                      <Typography variant="body2" color="textSecondary">500ml Bottles</Typography>
+                      <Typography variant="h6" color="primary">
+                        {litersBreakdown['0.5L']} pcs
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, md: 2 }}>
+                      <Typography variant="body2" color="textSecondary">Total Liters</Typography>
+                      <Typography variant="h6" color="success.main">
+                        {litersBreakdown.total_liters}L
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography variant="body2" color="textSecondary">Till Input</Typography>
-                    <Typography variant="body1" sx={{ fontFamily: 'monospace', mb: 1 }}>
-                      {tillInput || 'No input'}
-                    </Typography>
-                    <Typography variant="body2" color="info.main">
-                      = KSh {tillTotal.toLocaleString()}
-                    </Typography>
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography variant="body2" color="textSecondary">Credit Input</Typography>
-                    <Typography variant="body1" sx={{ fontFamily: 'monospace', mb: 1 }}>
-                      {debtInput || 'No input'}
-                    </Typography>
-                    <Typography variant="body2" color="warning.main">
-                      = KSh {debtTotal.toLocaleString()}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
         </Grid>
       )}
     </Box>

@@ -35,6 +35,53 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_inventory_summary: {
+        Row: {
+          closing_stock: Json | null
+          created_at: string | null
+          date: string | null
+          id: string
+          opening_stock: Json | null
+          received_stock: Json | null
+          sales_stock: Json | null
+          station_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          closing_stock?: Json | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          opening_stock?: Json | null
+          received_stock?: Json | null
+          sales_stock?: Json | null
+          station_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          closing_stock?: Json | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          opening_stock?: Json | null
+          received_stock?: Json | null
+          sales_stock?: Json | null
+          station_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_inventory_summary_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_summaries: {
         Row: {
           cash_total: number | null
@@ -42,6 +89,8 @@ export type Database = {
           date: string
           debt_total: number | null
           id: string
+          liters_sold: Json | null
+          station_id: string | null
           till_total: number | null
           total_sales: number | null
           updated_at: string | null
@@ -53,6 +102,8 @@ export type Database = {
           date: string
           debt_total?: number | null
           id?: string
+          liters_sold?: Json | null
+          station_id?: string | null
           till_total?: number | null
           total_sales?: number | null
           updated_at?: string | null
@@ -64,12 +115,22 @@ export type Database = {
           date?: string
           debt_total?: number | null
           id?: string
+          liters_sold?: Json | null
+          station_id?: string | null
           till_total?: number | null
           total_sales?: number | null
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "daily_summaries_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       debt_notifications: {
         Row: {
@@ -157,6 +218,7 @@ export type Database = {
           created_at: string | null
           description: string
           id: number
+          station_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -164,6 +226,7 @@ export type Database = {
           created_at?: string | null
           description: string
           id?: number
+          station_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -171,9 +234,62 @@ export type Database = {
           created_at?: string | null
           description?: string
           id?: number
+          station_id?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "expenses_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory: {
+        Row: {
+          created_at: string | null
+          date: string | null
+          id: string
+          item_name: string
+          quantity: number
+          station_id: string | null
+          unit: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          item_name: string
+          quantity?: number
+          station_id?: string | null
+          unit?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          item_name?: string
+          quantity?: number
+          station_id?: string | null
+          unit?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -196,6 +312,65 @@ export type Database = {
         }
         Relationships: []
       }
+      station_members: {
+        Row: {
+          id: string
+          invited_by: string | null
+          joined_at: string | null
+          role: string | null
+          station_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          role?: string | null
+          station_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          role?: string | null
+          station_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "station_members_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stations: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -207,6 +382,7 @@ export type Database = {
           paid: boolean
           paid_status: boolean | null
           payment_method: string
+          station_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -219,6 +395,7 @@ export type Database = {
           paid?: boolean
           paid_status?: boolean | null
           payment_method: string
+          station_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -231,6 +408,7 @@ export type Database = {
           paid?: boolean
           paid_status?: boolean | null
           payment_method?: string
+          station_id?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -239,6 +417,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
             referencedColumns: ["id"]
           },
         ]
@@ -272,6 +457,10 @@ export type Database = {
       assign_admin_role: {
         Args: { _email: string }
         Returns: undefined
+      }
+      calculate_liters_from_amount: {
+        Args: { amount: number }
+        Returns: Json
       }
       has_role: {
         Args: {

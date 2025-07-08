@@ -1,135 +1,157 @@
 
 import React from 'react'
 import {
-  Box,
-  BottomNavigation,
-  BottomNavigationAction,
   AppBar,
   Toolbar,
   Typography,
+  Tabs,
+  Tab,
   IconButton,
+  Menu,
+  MenuItem,
+  Box,
   useTheme,
   useMediaQuery,
 } from '@mui/material'
 import {
   Calculate,
-  Receipt,
   PointOfSale,
   AccountBalance,
-  Analytics,
-  Assessment,
-  MoneyOff,
-  AccountBalanceWallet,
-  ExitToApp,
-  DarkMode,
-  LightMode,
+  Inventory,
+  Receipt,
   Person,
   AdminPanelSettings,
+  Business,
+  MoreVert,
 } from '@mui/icons-material'
-import { useAuth } from '../contexts/AuthContext'
-import { useTheme as useAppTheme } from '../contexts/ThemeContext'
 
 interface LayoutProps {
   children: React.ReactNode
   activeTab: number
-  onTabChange: (tab: number) => void
-  onProfileClick?: () => void
+  onTabChange: (newValue: number) => void
+  onProfileClick: () => void
   onAdminClick?: () => void
+  onStationClick?: () => void
 }
 
-const Layout: React.FC<LayoutProps> = ({ 
-  children, 
-  activeTab, 
-  onTabChange, 
+const Layout: React.FC<LayoutProps> = ({
+  children,
+  activeTab,
+  onTabChange,
   onProfileClick,
-  onAdminClick 
+  onAdminClick,
+  onStationClick,
 }) => {
-  const { signOut } = useAuth()
-  const { isDark, toggleTheme } = useAppTheme()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
 
   const tabs = [
     { label: 'Calculator', icon: <Calculate /> },
-    { label: 'Records', icon: <Receipt /> },
-    { label: 'Sale', icon: <PointOfSale /> },
+    { label: 'Sales', icon: <PointOfSale /> },
     { label: 'Debts', icon: <AccountBalance /> },
-    { label: 'Reports', icon: <Assessment /> },
-    { label: 'Analytics', icon: <Analytics /> },
-    { label: 'Expenses', icon: <MoneyOff /> },
-    { label: 'Reconciliation', icon: <AccountBalanceWallet /> },
+    { label: 'Inventory', icon: <Inventory /> },
+    { label: 'Expenses', icon: <Receipt /> },
   ]
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" color="primary">
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static" elevation={1}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            AquaFlow
+            AquaFlow254
           </Typography>
-          {onAdminClick && (
-            <IconButton
-              color="inherit"
-              onClick={onAdminClick}
-              aria-label="admin panel"
-            >
-              <AdminPanelSettings />
-            </IconButton>
+
+          {!isMobile && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {onStationClick && (
+                <IconButton color="inherit" onClick={onStationClick}>
+                  <Business />
+                </IconButton>
+              )}
+              {onAdminClick && (
+                <IconButton color="inherit" onClick={onAdminClick}>
+                  <AdminPanelSettings />
+                </IconButton>
+              )}
+              <IconButton color="inherit" onClick={onProfileClick}>
+                <Person />
+              </IconButton>
+            </Box>
           )}
-          <IconButton
-            color="inherit"
-            onClick={onProfileClick}
-            aria-label="profile"
-          >
-            <Person />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            onClick={toggleTheme}
-            aria-label="toggle theme"
-          >
-            {isDark ? <LightMode /> : <DarkMode />}
-          </IconButton>
-          <IconButton
-            color="inherit"
-            onClick={signOut}
-            aria-label="sign out"
-          >
-            <ExitToApp />
-          </IconButton>
+
+          {isMobile && (
+            <>
+              <IconButton color="inherit" onClick={handleMenuOpen}>
+                <MoreVert />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                {onStationClick && (
+                  <MenuItem onClick={() => { onStationClick(); handleMenuClose(); }}>
+                    <Business sx={{ mr: 1 }} />
+                    Station Management
+                  </MenuItem>
+                )}
+                {onAdminClick && (
+                  <MenuItem onClick={() => { onAdminClick(); handleMenuClose(); }}>
+                    <AdminPanelSettings sx={{ mr: 1 }} />
+                    Admin Panel
+                  </MenuItem>
+                )}
+                <MenuItem onClick={() => { onProfileClick(); handleMenuClose(); }}>
+                  <Person sx={{ mr: 1 }} />
+                  Profile
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Toolbar>
+
+        {activeTab >= 0 && (
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => onTabChange(newValue)}
+            variant={isMobile ? 'scrollable' : 'fullWidth'}
+            scrollButtons={isMobile ? 'auto' : false}
+            sx={{
+              borderTop: 1,
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+              color: 'text.primary',
+            }}
+          >
+            {tabs.map((tab, index) => (
+              <Tab
+                key={index}
+                icon={tab.icon}
+                label={tab.label}
+                iconPosition="start"
+                sx={{
+                  minHeight: 48,
+                  textTransform: 'none',
+                  fontSize: '0.875rem',
+                }}
+              />
+            ))}
+          </Tabs>
+        )}
       </AppBar>
 
-      <Box sx={{ flex: 1, overflow: 'hidden' }}>
+      <Box component="main" sx={{ bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
         {children}
       </Box>
-
-      <BottomNavigation
-        value={activeTab}
-        onChange={(_, newValue) => onTabChange(newValue)}
-        showLabels
-        sx={{
-          borderTop: 1,
-          borderColor: 'divider',
-          '& .MuiBottomNavigationAction-root': {
-            minWidth: 'auto',
-            px: 1,
-          },
-        }}
-      >
-        {tabs.map((tab, index) => (
-          <BottomNavigationAction
-            key={index}
-            label={isMobile ? '' : tab.label}
-            icon={tab.icon}
-            sx={{
-              '& .MuiBottomNavigationAction-label': {
-                fontSize: '0.7rem',
-              },
-            }}
-          />
-        ))}
-      </BottomNavigation>
     </Box>
   )
 }

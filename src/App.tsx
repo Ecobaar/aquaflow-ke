@@ -11,16 +11,15 @@ import Auth from './components/Auth'
 import Layout from './components/Layout'
 import Calculator from './components/Calculator'
 import Records from './components/Records'
-import CustomerManager from './components/CustomerManager'
 import Sales from './components/Sales'
-import Reconciliation from './components/Reconciliation'
-import UserProfile from './components/UserProfile'
-import AdminPanel from './components/AdminPanel'
-import InstallPrompt from './components/InstallPrompt'
 import DebtManager from './components/DebtManager'
 import Analytics from './components/Analytics'
 import Expenses from './components/Expenses'
-import Placeholder from './components/Placeholder'
+import Inventory from './components/Inventory'
+import UserProfile from './components/UserProfile'
+import AdminPanel from './components/AdminPanel'
+import StationManagement from './components/StationManagement'
+import InstallPrompt from './components/InstallPrompt'
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth()
@@ -29,6 +28,7 @@ const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0)
   const [showProfile, setShowProfile] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
+  const [showStationManagement, setShowStationManagement] = useState(false)
 
   const theme = createTheme({
     palette: {
@@ -88,6 +88,7 @@ const AppContent: React.FC = () => {
           onTabChange={() => {}} 
           onProfileClick={() => setShowProfile(false)}
           onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
+          onStationClick={() => setShowStationManagement(true)}
         >
           <UserProfile />
         </Layout>
@@ -104,8 +105,26 @@ const AppContent: React.FC = () => {
           onTabChange={() => {}} 
           onProfileClick={() => setShowProfile(true)}
           onAdminClick={() => setShowAdmin(false)}
+          onStationClick={() => setShowStationManagement(true)}
         >
           <AdminPanel />
+        </Layout>
+      </ThemeProvider>
+    )
+  }
+
+  if (showStationManagement) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Layout 
+          activeTab={-1} 
+          onTabChange={() => {}} 
+          onProfileClick={() => setShowProfile(true)}
+          onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
+          onStationClick={() => setShowStationManagement(false)}
+        >
+          <StationManagement />
         </Layout>
       </ThemeProvider>
     )
@@ -116,19 +135,13 @@ const AppContent: React.FC = () => {
       case 0:
         return <Calculator />
       case 1:
-        return <Records />
-      case 2:
         return <Sales />
-      case 3:
+      case 2:
         return <DebtManager />
+      case 3:
+        return <Inventory />
       case 4:
-        return <Placeholder title="Reports" description="Generate daily, weekly, monthly, and yearly sales summaries" />
-      case 5:
-        return <Analytics />
-      case 6:
         return <Expenses />
-      case 7:
-        return <Reconciliation />
       default:
         return <Calculator />
     }
@@ -142,6 +155,7 @@ const AppContent: React.FC = () => {
         onTabChange={setActiveTab}
         onProfileClick={() => setShowProfile(true)}
         onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
+        onStationClick={() => setShowStationManagement(true)}
       >
         {renderTabContent()}
       </Layout>

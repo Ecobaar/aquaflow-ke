@@ -21,6 +21,8 @@ const Auth: React.FC = () => {
   const [tab, setTab] = useState(0)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [stationName, setStationName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -35,18 +37,32 @@ const Auth: React.FC = () => {
       return
     }
 
+    if (tab === 1 && (!fullName || !stationName)) {
+      setMessage({ type: 'error', text: 'Please fill in your name and station name' })
+      return
+    }
+
     setLoading(true)
     setMessage(null)
 
     try {
-      const { error } = tab === 0 
-        ? await signIn(email, password)
-        : await signUp(email, password)
-
-      if (error) {
-        setMessage({ type: 'error', text: error.message })
-      } else if (tab === 1) {
-        setMessage({ type: 'success', text: 'Check your email for the confirmation link!' })
+      if (tab === 0) {
+        const { error } = await signIn(email, password)
+        if (error) {
+          setMessage({ type: 'error', text: error.message })
+        }
+      } else {
+        // For signup, we'll store additional data in user metadata
+        const { error } = await signUp(email, password, {
+          full_name: fullName,
+          station_name: stationName
+        })
+        
+        if (error) {
+          setMessage({ type: 'error', text: error.message })
+        } else {
+          setMessage({ type: 'success', text: 'Check your email for the confirmation link!' })
+        }
       }
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message })
@@ -68,7 +84,7 @@ const Auth: React.FC = () => {
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       p: 2
     }}>
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
+      <Card sx={{ maxWidth: 450, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Typography variant="h4" gutterBottom color="primary">
@@ -85,6 +101,31 @@ const Auth: React.FC = () => {
           </Tabs>
 
           <form onSubmit={handleSubmit}>
+            {tab === 1 && (
+              <>
+                <TextField
+                  fullWidth
+                  label="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  margin="normal"
+                  required
+                  disabled={loading}
+                />
+                <TextField
+                  fullWidth
+                  label="Water Station Name"
+                  value={stationName}
+                  onChange={(e) => setStationName(e.target.value)}
+                  margin="normal"
+                  required
+                  disabled={loading}
+                  placeholder="e.g., Aquamist-Kahawa"
+                  helperText="Enter your water station name"
+                />
+              </>
+            )}
+            
             <TextField
               fullWidth
               label="Email"
@@ -95,6 +136,7 @@ const Auth: React.FC = () => {
               required
               disabled={loading}
             />
+            
             <TextField
               fullWidth
               label="Password"
@@ -134,7 +176,7 @@ const Auth: React.FC = () => {
               disabled={loading}
               sx={{ mt: 3 }}
             >
-              {loading ? 'Processing...' : (tab === 0 ? 'Sign In' : 'Sign Up')}
+              {loading ? 'Processing...' : (tab === 0 ? 'Sign In' : 'Create Account')}
             </Button>
           </form>
         </CardContent>
