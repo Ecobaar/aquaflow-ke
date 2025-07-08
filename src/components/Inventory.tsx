@@ -400,7 +400,7 @@ const InventoryComponent: React.FC = () => {
         <DialogTitle>Daily Inventory Summary</DialogTitle>
         <DialogContent>
           <Typography variant="body2" gutterBottom>
-            Enter inventory data as JSON objects, e.g., {"20L_bottles": 50, "bottle_caps": 100}
+            Enter inventory data as JSON objects, e.g., {`{"20L_bottles": 50, "bottle_caps": 100}`}
           </Typography>
           <TextField
             fullWidth
@@ -410,7 +410,7 @@ const InventoryComponent: React.FC = () => {
             value={openingStock}
             onChange={(e) => setOpeningStock(e.target.value)}
             margin="normal"
-            placeholder='{"20L_bottles": 50, "10L_bottles": 30}'
+            placeholder={`{"20L_bottles": 50, "10L_bottles": 30}`}
           />
           <TextField
             fullWidth
@@ -420,7 +420,7 @@ const InventoryComponent: React.FC = () => {
             value={receivedStock}
             onChange={(e) => setReceivedStock(e.target.value)}
             margin="normal"
-            placeholder='{"20L_bottles": 20, "10L_bottles": 15}'
+            placeholder={`{"20L_bottles": 20, "10L_bottles": 15}`}
           />
           <TextField
             fullWidth
@@ -430,7 +430,7 @@ const InventoryComponent: React.FC = () => {
             value={salesStock}
             onChange={(e) => setSalesStock(e.target.value)}
             margin="normal"
-            placeholder='{"20L_bottles": 35, "10L_bottles": 25}'
+            placeholder={`{"20L_bottles": 35, "10L_bottles": 25}`}
           />
         </DialogContent>
         <DialogActions>
