@@ -6,7 +6,7 @@ import {
   TextField,
   Button,
   Typography,
-  Grid,
+  Grid2 as Grid,
   Card,
   CardContent,
   Alert,
@@ -249,7 +249,7 @@ const InventoryComponent: React.FC = () => {
       )}
 
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Paper sx={{ p: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">Inventory Items</Typography>
@@ -313,32 +313,32 @@ const InventoryComponent: React.FC = () => {
         </Grid>
 
         {dailySummary && (
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Today's Inventory Summary
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={3}>
+                  <Grid xs={3}>
                     <Typography variant="body2" color="textSecondary">Opening Stock</Typography>
                     <Typography variant="body1">
                       {JSON.stringify(dailySummary.opening_stock)}
                     </Typography>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid xs={3}>
                     <Typography variant="body2" color="textSecondary">Received</Typography>
                     <Typography variant="body1">
                       {JSON.stringify(dailySummary.received_stock)}
                     </Typography>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid xs={3}>
                     <Typography variant="body2" color="textSecondary">Sales</Typography>
                     <Typography variant="body1">
                       {JSON.stringify(dailySummary.sales_stock)}
                     </Typography>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid xs={3}>
                     <Typography variant="body2" color="textSecondary">Closing Stock</Typography>
                     <Typography variant="body1">
                       {JSON.stringify(dailySummary.closing_stock)}
@@ -436,7 +436,7 @@ const InventoryComponent: React.FC = () => {
         <DialogActions>
           <Button onClick={() => setSummaryDialogOpen(false)}>Cancel</Button>
           <Button onClick={handleSaveDailySummary} variant="contained" disabled={loading}>
-            {loading ? 'Saving...' : 'Save Summary'}
+            {loading ? 'Saving..' : 'Save Summary'}
           </Button>
         </DialogActions>
       </Dialog>
