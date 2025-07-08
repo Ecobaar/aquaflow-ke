@@ -47,7 +47,7 @@ interface DailyInventorySummary {
   closing_stock: any
 }
 
-const Inventory: React.FC = () => {
+const InventoryComponent: React.FC = () => {
   const [items, setItems] = useState<InventoryItem[]>([])
   const [dailySummary, setDailySummary] = useState<DailyInventorySummary | null>(null)
   const [itemName, setItemName] = useState('')
@@ -444,4 +444,4 @@ const Inventory: React.FC = () => {
   )
 }
 
-export default Inventory
+export default InventoryComponent
