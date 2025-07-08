@@ -5,7 +5,7 @@ import {
   Paper,
   Button,
   Typography,
-  Grid,
+  Grid2 as Grid,
   Alert,
 } from '@mui/material'
 import { Inventory, Add, Assessment } from '@mui/icons-material'
@@ -116,7 +116,7 @@ const InventoryComponent: React.FC = () => {
       )}
 
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Paper sx={{ p: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">Inventory Items</Typography>
@@ -147,7 +147,7 @@ const InventoryComponent: React.FC = () => {
         </Grid>
 
         {dailySummary && (
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <DailySummaryCard dailySummary={dailySummary} />
           </Grid>
         )}
