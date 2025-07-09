@@ -4,9 +4,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { CssBaseline, CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { AdminProvider, useAdmin } from './contexts/AdminContext'
 import { ThemeProvider as CustomThemeProvider, useTheme } from './contexts/ThemeContext'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { OfflineIndicator } from './components/OfflineIndicator'
 import Auth from './components/Auth'
 import Layout from './components/Layout'
 import Calculator from './components/Calculator'
@@ -83,6 +86,7 @@ const AppContent: React.FC = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <OfflineIndicator />
         <Layout 
           activeTab={-1} 
           onTabChange={() => {}} 
@@ -100,6 +104,7 @@ const AppContent: React.FC = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <OfflineIndicator />
         <Layout 
           activeTab={-1} 
           onTabChange={() => {}} 
@@ -117,6 +122,7 @@ const AppContent: React.FC = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <OfflineIndicator />
         <Layout 
           activeTab={-1} 
           onTabChange={() => {}} 
@@ -152,6 +158,7 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <OfflineIndicator />
       <Layout 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
@@ -159,7 +166,9 @@ const AppContent: React.FC = () => {
         onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
         onStationClick={() => setShowStationManagement(true)}
       >
-        {renderTabContent()}
+        <ErrorBoundary>
+          {renderTabContent()}
+        </ErrorBoundary>
       </Layout>
       <InstallPrompt />
     </ThemeProvider>
@@ -168,15 +177,23 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <CustomThemeProvider>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <AuthProvider>
-          <AdminProvider>
-            <AppContent />
-          </AdminProvider>
-        </AuthProvider>
-      </LocalizationProvider>
-    </CustomThemeProvider>
+    <ErrorBoundary>
+      <CustomThemeProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <AuthProvider>
+            <AdminProvider>
+              <AppContent />
+              <Toaster 
+                position="top-center" 
+                richColors 
+                closeButton 
+                duration={4000}
+              />
+            </AdminProvider>
+          </AuthProvider>
+        </LocalizationProvider>
+      </CustomThemeProvider>
+    </ErrorBoundary>
   )
 }
 

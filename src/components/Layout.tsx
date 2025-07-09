@@ -4,8 +4,6 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Tabs,
-  Tab,
   IconButton,
   Menu,
   MenuItem,
@@ -14,17 +12,12 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import {
-  Calculate,
-  PointOfSale,
-  AccountBalance,
-  Inventory,
-  Receipt,
-  Assignment,
   Person,
   AdminPanelSettings,
   Business,
   MoreVert,
 } from '@mui/icons-material'
+import { CustomBottomNavigation } from './Navigation/BottomNavigation'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -54,15 +47,6 @@ const Layout: React.FC<LayoutProps> = ({
   const handleMenuClose = () => {
     setAnchorEl(null)
   }
-
-  const tabs = [
-    { label: 'Calculator', icon: <Calculate /> },
-    { label: 'Sales', icon: <PointOfSale /> },
-    { label: 'Debts', icon: <AccountBalance /> },
-    { label: 'Inventory', icon: <Inventory /> },
-    { label: 'Expenses', icon: <Receipt /> },
-    { label: 'Records', icon: <Assignment /> },
-  ]
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -132,45 +116,10 @@ const Layout: React.FC<LayoutProps> = ({
       </Box>
 
       {activeTab >= 0 && (
-        <Box sx={{ 
-          position: 'fixed', 
-          bottom: 0, 
-          left: 0, 
-          right: 0, 
-          bgcolor: 'background.paper',
-          borderTop: 1,
-          borderColor: 'divider',
-          zIndex: 1000
-        }}>
-          <Tabs
-            value={activeTab}
-            onChange={(_, newValue) => onTabChange(newValue)}
-            variant={isMobile ? 'scrollable' : 'fullWidth'}
-            scrollButtons={isMobile ? 'auto' : false}
-            sx={{
-              '& .MuiTab-root': {
-                minHeight: 64,
-                textTransform: 'none',
-                fontSize: '0.75rem',
-                padding: '6px 12px',
-              },
-            }}
-          >
-            {tabs.map((tab, index) => (
-              <Tab
-                key={index}
-                icon={tab.icon}
-                label={tab.label}
-                iconPosition="top"
-                sx={{
-                  minHeight: 64,
-                  textTransform: 'none',
-                  fontSize: '0.75rem',
-                }}
-              />
-            ))}
-          </Tabs>
-        </Box>
+        <CustomBottomNavigation
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+        />
       )}
     </Box>
   )
