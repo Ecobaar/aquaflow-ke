@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { Card, CardContent, Typography, Grid } from '@mui/material'
+import { Card, CardContent, Typography, Box } from '@mui/material'
 import { DailyInventorySummary } from './types'
 
 interface DailySummaryCardProps {
@@ -14,32 +14,32 @@ const DailySummaryCard: React.FC<DailySummaryCardProps> = ({ dailySummary }) => 
         <Typography variant="h6" gutterBottom>
           Today's Inventory Summary
         </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
+          <Box>
             <Typography variant="body2" color="textSecondary">Opening Stock</Typography>
             <Typography variant="body1">
               {JSON.stringify(dailySummary.opening_stock)}
             </Typography>
-          </Grid>
-          <Grid item xs={3}>
+          </Box>
+          <Box>
             <Typography variant="body2" color="textSecondary">Received</Typography>
             <Typography variant="body1">
               {JSON.stringify(dailySummary.received_stock)}
             </Typography>
-          </Grid>
-          <Grid item xs={3}>
+          </Box>
+          <Box>
             <Typography variant="body2" color="textSecondary">Sales</Typography>
             <Typography variant="body1">
               {JSON.stringify(dailySummary.sales_stock)}
             </Typography>
-          </Grid>
-          <Grid item xs={3}>
+          </Box>
+          <Box>
             <Typography variant="body2" color="textSecondary">Closing Stock</Typography>
             <Typography variant="body1">
               {JSON.stringify(dailySummary.closing_stock)}
             </Typography>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   )

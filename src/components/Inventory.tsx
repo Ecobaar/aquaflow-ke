@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react'
 import {
   Box,
   Paper,
   Button,
   Typography,
-  Grid,
   Alert,
 } from '@mui/material'
 import { Inventory, Add, Assessment } from '@mui/icons-material'
@@ -114,43 +114,39 @@ const InventoryComponent: React.FC = () => {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Inventory Items</Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={openAddDialog}
-                >
-                  Add Item
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Assessment />}
-                  onClick={() => setSummaryDialogOpen(true)}
-                >
-                  Daily Summary
-                </Button>
-              </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Paper sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6">Inventory Items</Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={openAddDialog}
+              >
+                Add Item
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Assessment />}
+                onClick={() => setSummaryDialogOpen(true)}
+              >
+                Daily Summary
+              </Button>
             </Box>
+          </Box>
 
-            <InventoryTable
-              items={items}
-              onEdit={openEditDialog}
-              onDelete={handleDeleteItem}
-            />
-          </Paper>
-        </Grid>
+          <InventoryTable
+            items={items}
+            onEdit={openEditDialog}
+            onDelete={handleDeleteItem}
+          />
+        </Paper>
 
         {dailySummary && (
-          <Grid item xs={12}>
-            <DailySummaryCard dailySummary={dailySummary} />
-          </Grid>
+          <DailySummaryCard dailySummary={dailySummary} />
         )}
-      </Grid>
+      </Box>
 
       <AddItemDialog
         open={dialogOpen}
