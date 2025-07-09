@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 import {
   Box,
@@ -123,65 +122,65 @@ const Calculator: React.FC = () => {
         />
 
         <Grid container spacing={1}>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('C', clear, 'contained')}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('±', () => setDisplay(String(-parseFloat(display))))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('%', () => setDisplay(String(parseFloat(display) / 100)))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('÷', () => performOperation('/'), 'contained')}
           </Grid>
 
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('7', () => inputNumber('7'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('8', () => inputNumber('8'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('9', () => inputNumber('9'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('×', () => performOperation('*'), 'contained')}
           </Grid>
 
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('4', () => inputNumber('4'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('5', () => inputNumber('5'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('6', () => inputNumber('6'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('-', () => performOperation('-'), 'contained')}
           </Grid>
 
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('1', () => inputNumber('1'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('2', () => inputNumber('2'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('3', () => inputNumber('3'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('+', () => performOperation('+'), 'contained')}
           </Grid>
 
-          <Grid xs={6}>
+          <Grid item xs={6}>
             {createButton('0', () => inputNumber('0'))}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('.', inputDecimal)}
           </Grid>
-          <Grid xs={3}>
+          <Grid item xs={3}>
             {createButton('=', performCalculation, 'contained')}
           </Grid>
         </Grid>
