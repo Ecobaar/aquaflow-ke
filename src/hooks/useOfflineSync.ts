@@ -2,9 +2,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+type TableName = 'transactions' | 'customers' | 'debts' | 'expenses' | 'inventory' | 'daily_summaries';
+
 interface PendingOperation {
   id: string;
-  table: string;
+  table: TableName;
   operation: 'insert' | 'update' | 'delete';
   data: any;
   timestamp: Date;
@@ -71,13 +73,13 @@ export const useOfflineSync = () => {
       try {
         switch (operation.operation) {
           case 'insert':
-            await supabase.from(operation.table).insert(operation.data);
+            await (supabase.from as any)(operation.table).insert(operation.data);
             break;
           case 'update':
-            await supabase.from(operation.table).update(operation.data).eq('id', operation.data.id);
+            await (supabase.from as any)(operation.table).update(operation.data).eq('id', operation.data.id);
             break;
           case 'delete':
-            await supabase.from(operation.table).delete().eq('id', operation.data.id);
+            await (supabase.from as any)(operation.table).delete().eq('id', operation.data.id);
             break;
         }
         successful.push(operation.id);

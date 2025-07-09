@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Box, Chip, Typography } from '@mui/material';
-import { WifiOff, Wifi, Clock } from '@mui/icons-material';
+import { WifiOff, Wifi, AccessTime } from '@mui/icons-material';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 
 export const OfflineIndicator: React.FC = () => {
@@ -24,7 +24,7 @@ export const OfflineIndicator: React.FC = () => {
       )}
       {pendingOperations.length > 0 && (
         <Chip
-          icon={isSyncing ? <Clock /> : <Clock />}
+          icon={isSyncing ? <AccessTime /> : <AccessTime />}
           label={`${pendingOperations.length} pending sync${isSyncing ? ' (syncing...)' : ''}`}
           color={isSyncing ? "info" : "default"}
           variant="outlined"
