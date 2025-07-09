@@ -142,6 +142,8 @@ const AppContent: React.FC = () => {
         return <Inventory />
       case 4:
         return <Expenses />
+      case 5:
+        return <Records />
       default:
         return <Calculator />
     }

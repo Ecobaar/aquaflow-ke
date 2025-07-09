@@ -19,6 +19,7 @@ import {
   AccountBalance,
   Inventory,
   Receipt,
+  Assignment,
   Person,
   AdminPanelSettings,
   Business,
@@ -60,10 +61,11 @@ const Layout: React.FC<LayoutProps> = ({
     { label: 'Debts', icon: <AccountBalance /> },
     { label: 'Inventory', icon: <Inventory /> },
     { label: 'Expenses', icon: <Receipt /> },
+    { label: 'Records', icon: <Assignment /> },
   ]
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <AppBar position="static" elevation={1}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -118,18 +120,40 @@ const Layout: React.FC<LayoutProps> = ({
             </>
           )}
         </Toolbar>
+      </AppBar>
 
-        {activeTab >= 0 && (
+      <Box component="main" sx={{ 
+        bgcolor: 'background.default', 
+        flexGrow: 1, 
+        overflow: 'auto',
+        pb: activeTab >= 0 ? 8 : 0 // Add padding bottom when tabs are visible
+      }}>
+        {children}
+      </Box>
+
+      {activeTab >= 0 && (
+        <Box sx={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          bgcolor: 'background.paper',
+          borderTop: 1,
+          borderColor: 'divider',
+          zIndex: 1000
+        }}>
           <Tabs
             value={activeTab}
             onChange={(_, newValue) => onTabChange(newValue)}
             variant={isMobile ? 'scrollable' : 'fullWidth'}
             scrollButtons={isMobile ? 'auto' : false}
             sx={{
-              borderTop: 1,
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
-              color: 'text.primary',
+              '& .MuiTab-root': {
+                minHeight: 64,
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                padding: '6px 12px',
+              },
             }}
           >
             {tabs.map((tab, index) => (
@@ -137,21 +161,17 @@ const Layout: React.FC<LayoutProps> = ({
                 key={index}
                 icon={tab.icon}
                 label={tab.label}
-                iconPosition="start"
+                iconPosition="top"
                 sx={{
-                  minHeight: 48,
+                  minHeight: 64,
                   textTransform: 'none',
-                  fontSize: '0.875rem',
+                  fontSize: '0.75rem',
                 }}
               />
             ))}
           </Tabs>
-        )}
-      </AppBar>
-
-      <Box component="main" sx={{ bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
-        {children}
-      </Box>
+        </Box>
+      )}
     </Box>
   )
 }
