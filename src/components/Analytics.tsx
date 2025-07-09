@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react'
 import {
   Box,
   Paper,
   Typography,
-  Grid2 as Grid,
+  Grid,
   Card,
   CardContent,
   Alert,
@@ -162,7 +161,7 @@ const Analytics: React.FC = () => {
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary">
@@ -174,7 +173,7 @@ const Analytics: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary">
@@ -186,7 +185,7 @@ const Analytics: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary">
@@ -202,7 +201,7 @@ const Analytics: React.FC = () => {
 
       {/* Charts */}
       <Grid container spacing={3}>
-        <Grid xs={12} md={8}>
+        <Grid item xs={12} md={8}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Daily Sales Trend
@@ -218,7 +217,7 @@ const Analytics: React.FC = () => {
             </ResponsiveContainer>
           </Paper>
         </Grid>
-        <Grid xs={12} md={4}>
+        <Grid item xs={12} md={4}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Payment Methods

@@ -13,7 +13,7 @@ import {
 import {
   PointOfSale,
   Assessment,
-  Calculator,
+  Calculate,
   MoreVert,
   Inventory,
   MonetizationOn,
@@ -40,7 +40,7 @@ export const CustomBottomNavigation: React.FC<CustomBottomNavigationProps> = ({
   const mainTabs = [
     { label: 'Sales', value: 0, icon: <PointOfSale /> },
     { label: 'Analytics', value: 1, icon: <Assessment /> },
-    { label: 'Calculator', value: 2, icon: <Calculator /> },
+    { label: 'Calculator', value: 2, icon: <Calculate /> },
   ]
 
   const moreTabs = [
