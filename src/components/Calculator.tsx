@@ -1,213 +1,191 @@
 
 import React, { useState } from 'react'
-import { 
-  Box, 
-  Typography, 
-  TextField, 
-  Button, 
-  Paper, 
-  Select, 
-  MenuItem, 
-  FormControl, 
-  InputLabel,
-  Alert,
-  Snackbar
+import {
+  Box,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Grid,
+  Divider,
 } from '@mui/material'
-import { supabase } from '@/integrations/supabase/client'
-import { useAuth } from '@/contexts/AuthContext'
-import { useErrorHandler } from '@/hooks/useErrorHandler'
-import { useOfflineSync } from '@/hooks/useOfflineSync'
-import { LoadingSpinner } from './LoadingSpinner'
 
 const Calculator: React.FC = () => {
-  const { user } = useAuth()
-  const { handleError, handleSuccess } = useErrorHandler()
-  const { isOnline, addPendingOperation } = useOfflineSync()
-  
-  const [amount, setAmount] = useState('')
-  const [customerName, setCustomerName] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('cash')
-  const [loading, setLoading] = useState(false)
-  const [liters, setLiters] = useState<any>(null)
+  const [display, setDisplay] = useState('0')
+  const [previousValue, setPreviousValue] = useState<number | null>(null)
+  const [operation, setOperation] = useState<string | null>(null)
+  const [waitingForOperand, setWaitingForOperand] = useState(false)
 
-  const calculateLiters = (amount: number) => {
-    const result = {
-      '20L': Math.floor(amount / 200),
-      '10L': Math.floor((amount % 200) / 100),
-      '5L': Math.floor(((amount % 200) % 100) / 50),
-      '1L': Math.floor((((amount % 200) % 100) % 50) / 10),
-      '0.5L': Math.floor(((((amount % 200) % 100) % 50) % 10) / 5),
-      total_liters: 0
-    }
-    
-    result.total_liters = (result['20L'] * 20) + (result['10L'] * 10) + 
-                         (result['5L'] * 5) + (result['1L'] * 1) + (result['0.5L'] * 0.5)
-    
-    return result
-  }
-
-  const handleCalculate = () => {
-    const amt = parseFloat(amount)
-    if (isNaN(amt) || amt <= 0) {
-      handleError(new Error('Please enter a valid amount'), 'Calculator')
-      return
-    }
-
-    try {
-      const result = calculateLiters(amt)
-      setLiters(result)
-    } catch (error) {
-      handleError(error, 'Calculation failed')
+  const inputNumber = (num: string) => {
+    if (waitingForOperand) {
+      setDisplay(String(num))
+      setWaitingForOperand(false)
+    } else {
+      setDisplay(display === '0' ? String(num) : display + num)
     }
   }
 
-  const handleRecordTransaction = async () => {
-    if (!user) {
-      handleError(new Error('Please log in to record transactions'), 'Authentication')
-      return
-    }
-
-    const amt = parseFloat(amount)
-    if (isNaN(amt) || amt <= 0) {
-      handleError(new Error('Please enter a valid amount'), 'Transaction')
-      return
-    }
-
-    if (!customerName.trim()) {
-      handleError(new Error('Please enter customer name'), 'Transaction')
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const transactionData = {
-        amount: amt,
-        customer_name: customerName,
-        payment_method: paymentMethod,
-        user_id: user.id,
-        description: `Water: ${liters?.total_liters || calculateLiters(amt).total_liters}L`
-      }
-
-      if (isOnline) {
-        const { error } = await supabase
-          .from('transactions')
-          .insert(transactionData)
-
-        if (error) throw error
-        handleSuccess('Transaction recorded successfully!')
-      } else {
-        addPendingOperation({
-          table: 'transactions',
-          operation: 'insert',
-          data: transactionData
-        })
-        handleSuccess('Transaction saved offline. Will sync when online.')
-      }
-
-      // Reset form
-      setAmount('')
-      setCustomerName('')
-      setPaymentMethod('cash')
-      setLiters(null)
-      
-    } catch (error) {
-      handleError(error, 'Failed to record transaction')
-    } finally {
-      setLoading(false)
+  const inputDecimal = () => {
+    if (waitingForOperand) {
+      setDisplay('0.')
+      setWaitingForOperand(false)
+    } else if (display.indexOf('.') === -1) {
+      setDisplay(display + '.')
     }
   }
+
+  const clear = () => {
+    setDisplay('0')
+    setPreviousValue(null)
+    setOperation(null)
+    setWaitingForOperand(false)
+  }
+
+  const performOperation = (nextOperation: string) => {
+    const inputValue = parseFloat(display)
+
+    if (previousValue === null) {
+      setPreviousValue(inputValue)
+    } else if (operation) {
+      const currentValue = previousValue || 0
+      const newValue = calculate(currentValue, inputValue, operation)
+
+      setDisplay(String(newValue))
+      setPreviousValue(newValue)
+    }
+
+    setWaitingForOperand(true)
+    setOperation(nextOperation)
+  }
+
+  const calculate = (firstValue: number, secondValue: number, operation: string): number => {
+    switch (operation) {
+      case '+':
+        return firstValue + secondValue
+      case '-':
+        return firstValue - secondValue
+      case '*':
+        return firstValue * secondValue
+      case '/':
+        return firstValue / secondValue
+      case '=':
+        return secondValue
+      default:
+        return secondValue
+    }
+  }
+
+  const performCalculation = () => {
+    const inputValue = parseFloat(display)
+
+    if (previousValue !== null && operation) {
+      const newValue = calculate(previousValue, inputValue, operation)
+      setDisplay(String(newValue))
+      setPreviousValue(null)
+      setOperation(null)
+      setWaitingForOperand(true)
+    }
+  }
+
+  const createButton = (label: string, onClick: () => void, variant: 'contained' | 'outlined' = 'outlined') => (
+    <Button
+      variant={variant}
+      onClick={onClick}
+      sx={{
+        minHeight: 60,
+        fontSize: '1.2rem',
+        fontWeight: 'bold'
+      }}
+    >
+      {label}
+    </Button>
+  )
 
   return (
-    <Box sx={{ p: 3, maxWidth: 600, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Water Calculator
+    <Box sx={{ p: 2, maxWidth: 400, mx: 'auto' }}>
+      <Typography variant="h5" gutterBottom color="primary">
+        Calculator
       </Typography>
 
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: 2 }}>
         <TextField
           fullWidth
-          label="Amount (KSh)"
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          margin="normal"
-          inputProps={{ min: 0, step: 5 }}
+          value={display}
+          InputProps={{
+            readOnly: true,
+            sx: {
+              fontSize: '2rem',
+              textAlign: 'right',
+              fontFamily: 'monospace'
+            }
+          }}
+          sx={{ mb: 2 }}
         />
 
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={handleCalculate}
-          sx={{ mt: 2, mb: 2 }}
-          disabled={!amount}
-        >
-          Calculate Liters
-        </Button>
+        <Grid container spacing={1}>
+          <Grid item xs={3}>
+            {createButton('C', clear, 'contained')}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('±', () => setDisplay(String(-parseFloat(display))))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('%', () => setDisplay(String(parseFloat(display) / 100)))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('÷', () => performOperation('/'), 'contained')}
+          </Grid>
 
-        {liters && (
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'primary.main', color: 'primary.contrastText', borderRadius: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Water Distribution:
-            </Typography>
-            <Typography>20L containers: {liters['20L']}</Typography>
-            <Typography>10L containers: {liters['10L']}</Typography>
-            <Typography>5L containers: {liters['5L']}</Typography>
-            <Typography>1L containers: {liters['1L']}</Typography>
-            <Typography>0.5L containers: {liters['0.5L']}</Typography>
-            <Typography variant="h6" sx={{ mt: 1, borderTop: 1, pt: 1 }}>
-              Total: {liters.total_liters}L
-            </Typography>
-          </Box>
-        )}
+          <Grid item xs={3}>
+            {createButton('7', () => inputNumber('7'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('8', () => inputNumber('8'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('9', () => inputNumber('9'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('×', () => performOperation('*'), 'contained')}
+          </Grid>
+
+          <Grid item xs={3}>
+            {createButton('4', () => inputNumber('4'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('5', () => inputNumber('5'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('6', () => inputNumber('6'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('-', () => performOperation('-'), 'contained')}
+          </Grid>
+
+          <Grid item xs={3}>
+            {createButton('1', () => inputNumber('1'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('2', () => inputNumber('2'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('3', () => inputNumber('3'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('+', () => performOperation('+'), 'contained')}
+          </Grid>
+
+          <Grid item xs={6}>
+            {createButton('0', () => inputNumber('0'))}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('.', inputDecimal)}
+          </Grid>
+          <Grid item xs={3}>
+            {createButton('=', performCalculation, 'contained')}
+          </Grid>
+        </Grid>
       </Paper>
-
-      {liters && (
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Record Transaction
-          </Typography>
-
-          <TextField
-            fullWidth
-            label="Customer Name"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            margin="normal"
-            required
-          />
-
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Payment Method</InputLabel>
-            <Select
-              value={paymentMethod}
-              label="Payment Method"
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-              <MenuItem value="cash">Cash</MenuItem>
-              <MenuItem value="till">Till Number</MenuItem>
-              <MenuItem value="debt">Debt</MenuItem>
-            </Select>
-          </FormControl>
-
-          {!isOnline && (
-            <Alert severity="warning" sx={{ my: 2 }}>
-              You're offline. Transaction will be saved locally and synced when online.
-            </Alert>
-          )}
-
-          <Button
-            fullWidth
-            variant="contained"
-            color="secondary"
-            onClick={handleRecordTransaction}
-            disabled={loading || !customerName.trim()}
-            sx={{ mt: 2 }}
-          >
-            {loading ? <LoadingSpinner size={20} message="" /> : 'Record Transaction'}
-          </Button>
-        </Paper>
-      )}
     </Box>
   )
 }

@@ -1,198 +1,85 @@
 
-import React, { useState } from 'react'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
-import { CssBaseline, CircularProgress, Box } from '@mui/material'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { Toaster } from 'sonner'
-import { AuthProvider, useAuth } from './contexts/AuthContext'
-import { AdminProvider, useAdmin } from './contexts/AdminContext'
-import { ThemeProvider as CustomThemeProvider, useTheme } from './contexts/ThemeContext'
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { createTheme } from '@mui/material/styles'
+import { AuthProvider } from './contexts/AuthContext'
+import { AdminProvider } from './contexts/AdminContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { OfflineIndicator } from './components/OfflineIndicator'
-import Auth from './components/Auth'
 import Layout from './components/Layout'
-import Calculator from './components/Calculator'
-import Records from './components/Records'
+import Auth from './components/Auth'
 import Sales from './components/Sales'
-import DebtManager from './components/DebtManager'
+import Records from './components/Records'
 import Analytics from './components/Analytics'
-import Expenses from './components/Expenses'
+import Calculator from './components/Calculator'
 import Inventory from './components/Inventory'
+import Expenses from './components/Expenses'
+import CustomerManager from './components/CustomerManager'
+import DebtManager from './components/DebtManager'
+import StationManagement from './components/StationManagement'
 import UserProfile from './components/UserProfile'
 import AdminPanel from './components/AdminPanel'
-import StationManagement from './components/StationManagement'
-import InstallPrompt from './components/InstallPrompt'
+import { useAuth } from './contexts/AuthContext'
+import './App.css'
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+})
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth()
-  const { isAdmin } = useAdmin()
-  const { isDark } = useTheme()
-  const [activeTab, setActiveTab] = useState(0)
-  const [showProfile, setShowProfile] = useState(false)
-  const [showAdmin, setShowAdmin] = useState(false)
-  const [showStationManagement, setShowStationManagement] = useState(false)
-
-  const theme = createTheme({
-    palette: {
-      mode: isDark ? 'dark' : 'light',
-      primary: {
-        main: '#1976d2',
-      },
-      secondary: {
-        main: '#4caf50',
-      },
-    },
-    typography: {
-      h4: {
-        fontWeight: 600,
-      },
-      h5: {
-        fontWeight: 600,
-      },
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            textTransform: 'none',
-            borderRadius: 8,
-          },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            borderRadius: 12,
-          },
-        },
-      },
-    },
-  })
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    )
+    return <div>Loading...</div>
   }
 
   if (!user) {
     return <Auth />
   }
 
-  if (showProfile) {
-    return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <OfflineIndicator />
-        <Layout 
-          activeTab={-1} 
-          onTabChange={() => {}} 
-          onProfileClick={() => setShowProfile(false)}
-          onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
-          onStationClick={() => setShowStationManagement(true)}
-        >
-          <UserProfile />
-        </Layout>
-      </ThemeProvider>
-    )
-  }
-
-  if (showAdmin && isAdmin) {
-    return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <OfflineIndicator />
-        <Layout 
-          activeTab={-1} 
-          onTabChange={() => {}} 
-          onProfileClick={() => setShowProfile(true)}
-          onAdminClick={() => setShowAdmin(false)}
-          onStationClick={() => setShowStationManagement(true)}
-        >
-          <AdminPanel />
-        </Layout>
-      </ThemeProvider>
-    )
-  }
-
-  if (showStationManagement) {
-    return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <OfflineIndicator />
-        <Layout 
-          activeTab={-1} 
-          onTabChange={() => {}} 
-          onProfileClick={() => setShowProfile(true)}
-          onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
-          onStationClick={() => setShowStationManagement(false)}
-        >
-          <StationManagement />
-        </Layout>
-      </ThemeProvider>
-    )
-  }
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 0:
-        return <Calculator />
-      case 1:
-        return <Sales />
-      case 2:
-        return <DebtManager />
-      case 3:
-        return <Inventory />
-      case 4:
-        return <Expenses />
-      case 5:
-        return <Records />
-      default:
-        return <Calculator />
-    }
-  }
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <OfflineIndicator />
-      <Layout 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab}
-        onProfileClick={() => setShowProfile(true)}
-        onAdminClick={isAdmin ? () => setShowAdmin(true) : undefined}
-        onStationClick={() => setShowStationManagement(true)}
-      >
-        <ErrorBoundary>
-          {renderTabContent()}
-        </ErrorBoundary>
-      </Layout>
-      <InstallPrompt />
-    </ThemeProvider>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Sales />} />
+        <Route path="/sales" element={<Sales />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/calculator" element={<Calculator />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/expenses" element={<Expenses />} />
+        <Route path="/records" element={<Records />} />
+        <Route path="/customers" element={<CustomerManager />} />
+        <Route path="/debts" element={<DebtManager />} />
+        <Route path="/stations" element={<StationManagement />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/admin" element={<AdminPanel />} />
+      </Routes>
+    </Layout>
   )
 }
 
-const App: React.FC = () => {
+function App() {
   return (
     <ErrorBoundary>
-      <CustomThemeProvider>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <AuthProvider>
-            <AdminProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <AdminProvider>
+            <Router>
+              <OfflineIndicator />
               <AppContent />
-              <Toaster 
-                position="top-center" 
-                richColors 
-                closeButton 
-                duration={4000}
-              />
-            </AdminProvider>
-          </AuthProvider>
-        </LocalizationProvider>
-      </CustomThemeProvider>
+            </Router>
+          </AdminProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   )
 }

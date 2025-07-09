@@ -469,6 +469,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      user_has_station_access: {
+        Args: { _station_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
