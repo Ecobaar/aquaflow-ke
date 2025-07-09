@@ -11,7 +11,6 @@ import {
   ListItemText,
 } from '@mui/material'
 import {
-  Home,
   PointOfSale,
   Assessment,
   Calculator,
@@ -25,16 +24,23 @@ import {
   Group,
 } from '@mui/icons-material'
 
-const AppBottomNavigation: React.FC = () => {
+interface CustomBottomNavigationProps {
+  activeTab: number
+  onTabChange: (newValue: number) => void
+}
+
+export const CustomBottomNavigation: React.FC<CustomBottomNavigationProps> = ({
+  activeTab,
+  onTabChange,
+}) => {
   const location = useLocation()
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
   const mainTabs = [
-    { label: 'Home', value: '/', icon: <Home /> },
-    { label: 'Sales', value: '/sales', icon: <PointOfSale /> },
-    { label: 'Analytics', value: '/analytics', icon: <Assessment /> },
-    { label: 'Calculator', value: '/calculator', icon: <Calculator /> },
+    { label: 'Sales', value: 0, icon: <PointOfSale /> },
+    { label: 'Analytics', value: 1, icon: <Assessment /> },
+    { label: 'Calculator', value: 2, icon: <Calculator /> },
   ]
 
   const moreTabs = [
@@ -60,22 +66,18 @@ const AppBottomNavigation: React.FC = () => {
     handleMoreClose()
   }
 
-  const getCurrentValue = () => {
-    const mainTab = mainTabs.find(tab => tab.value === location.pathname)
-    if (mainTab) return mainTab.value
-    
-    const moreTab = moreTabs.find(tab => tab.value === location.pathname)
-    if (moreTab) return 'more'
-    
-    return '/'
-  }
-
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: number | string) => {
     if (newValue === 'more') {
       handleMoreClick(event as React.MouseEvent<HTMLElement>)
-    } else {
-      navigate(newValue)
+    } else if (typeof newValue === 'number') {
+      onTabChange(newValue)
     }
+  }
+
+  const getCurrentValue = () => {
+    if (activeTab >= 0) return activeTab
+    const moreTab = moreTabs.find(tab => tab.value === location.pathname)
+    return moreTab ? 'more' : activeTab
   }
 
   return (
@@ -130,4 +132,4 @@ const AppBottomNavigation: React.FC = () => {
   )
 }
 
-export default AppBottomNavigation
+export default CustomBottomNavigation

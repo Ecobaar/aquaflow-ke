@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { createTheme } from '@mui/material/styles'
@@ -22,6 +22,7 @@ import StationManagement from './components/StationManagement'
 import UserProfile from './components/UserProfile'
 import AdminPanel from './components/AdminPanel'
 import { useAuth } from './contexts/AuthContext'
+import { useAdmin } from './contexts/AdminContext'
 import './App.css'
 
 const theme = createTheme({
@@ -37,6 +38,52 @@ const theme = createTheme({
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth()
+  const { isAdmin } = useAdmin()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Map routes to tab indices
+  const getActiveTab = () => {
+    switch (location.pathname) {
+      case '/':
+      case '/sales':
+        return 0 // Sales
+      case '/analytics':
+        return 1 // Analytics
+      case '/calculator':
+        return 2 // Calculator
+      default:
+        return -1 // For routes in "More" menu
+    }
+  }
+
+  const handleTabChange = (newValue: number) => {
+    switch (newValue) {
+      case 0:
+        navigate('/sales')
+        break
+      case 1:
+        navigate('/analytics')
+        break
+      case 2:
+        navigate('/calculator')
+        break
+    }
+  }
+
+  const handleProfileClick = () => {
+    navigate('/profile')
+  }
+
+  const handleAdminClick = () => {
+    if (isAdmin) {
+      navigate('/admin')
+    }
+  }
+
+  const handleStationClick = () => {
+    navigate('/stations')
+  }
 
   if (loading) {
     return <div>Loading...</div>
@@ -47,7 +94,13 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <Layout>
+    <Layout
+      activeTab={getActiveTab()}
+      onTabChange={handleTabChange}
+      onProfileClick={handleProfileClick}
+      onAdminClick={isAdmin ? handleAdminClick : undefined}
+      onStationClick={handleStationClick}
+    >
       <Routes>
         <Route path="/" element={<Sales />} />
         <Route path="/sales" element={<Sales />} />
