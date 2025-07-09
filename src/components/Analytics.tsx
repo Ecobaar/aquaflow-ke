@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react'
 import {
   Box,
   Paper,
   Typography,
-  Grid,
   Card,
   CardContent,
   Alert,
@@ -160,8 +160,8 @@ const Analytics: React.FC = () => {
       </Box>
 
       {/* Summary Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
+      <Box sx={{ display: 'flex', gap: 3, mb: 3, flexWrap: 'wrap' }}>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(33.333% - 16px)' }, minWidth: 0 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary">
@@ -172,8 +172,8 @@ const Analytics: React.FC = () => {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(33.333% - 16px)' }, minWidth: 0 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary">
@@ -184,8 +184,8 @@ const Analytics: React.FC = () => {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(33.333% - 16px)' }, minWidth: 0 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary">
@@ -196,12 +196,12 @@ const Analytics: React.FC = () => {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Charts */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+      <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.667% - 12px)' }, minWidth: 0 }}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Daily Sales Trend
@@ -216,8 +216,8 @@ const Analytics: React.FC = () => {
               </LineChart>
             </ResponsiveContainer>
           </Paper>
-        </Grid>
-        <Grid item xs={12} md={4}>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 12px)' }, minWidth: 0 }}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Payment Methods
@@ -242,8 +242,8 @@ const Analytics: React.FC = () => {
               </PieChart>
             </ResponsiveContainer>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   )
 }
