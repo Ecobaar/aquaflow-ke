@@ -49,10 +49,24 @@ const Layout: React.FC<LayoutProps> = ({
   }
 
   return (
-    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ 
+      flexGrow: 1, 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100vh',
+      width: '100vw',
+      overflow: 'hidden'
+    }}>
       <AppBar position="static" elevation={1}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Toolbar sx={{ minHeight: { xs: 48, sm: 64 } }}>
+          <Typography 
+            variant={isMobile ? 'h6' : 'h6'} 
+            component="div" 
+            sx={{ 
+              flexGrow: 1,
+              fontSize: { xs: '1.1rem', sm: '1.25rem' }
+            }}
+          >
             AquaFlow254
           </Typography>
 
@@ -110,7 +124,9 @@ const Layout: React.FC<LayoutProps> = ({
         bgcolor: 'background.default', 
         flexGrow: 1, 
         overflow: 'auto',
-        pb: activeTab >= 0 ? 8 : 0 // Add padding bottom when tabs are visible
+        pb: activeTab >= 0 ? { xs: 7, sm: 8 } : 0,
+        width: '100%',
+        minHeight: 0
       }}>
         {children}
       </Box>
