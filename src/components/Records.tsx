@@ -60,16 +60,24 @@ const Records: React.FC = () => {
   const fetchTransactions = async () => {
     try {
       setLoading(true)
+      setError(null)
+      
+      // Direct query to avoid infinite recursion issues
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
+      
       setTransactions(data || [])
     } catch (error: any) {
-      setError(error.message)
+      console.error('Error fetching transactions:', error)
+      setError(error.message || 'Failed to load transactions')
     } finally {
       setLoading(false)
     }
@@ -94,6 +102,7 @@ const Records: React.FC = () => {
           paid_status: selectedTransaction.paid_status,
         })
         .eq('id', selectedTransaction.id)
+        .eq('user_id', user?.id) // Add user_id check for security
 
       if (error) throw error
 
@@ -113,6 +122,7 @@ const Records: React.FC = () => {
         .from('transactions')
         .delete()
         .eq('id', id)
+        .eq('user_id', user?.id) // Add user_id check for security
 
       if (error) throw error
       fetchTransactions()
@@ -144,7 +154,11 @@ const Records: React.FC = () => {
         Transaction Records
       </Typography>
 
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
 
       <TableContainer component={Paper}>
         <Table>

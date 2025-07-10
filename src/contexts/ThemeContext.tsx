@@ -35,8 +35,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     
     // Apply theme class to document root
     const root = document.documentElement
-    root.classList.remove('light', 'dark')
-    root.classList.add(theme)
+    if (theme === 'dark') {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
   }, [theme])
 
   const toggleTheme = () => {
