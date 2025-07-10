@@ -75,7 +75,10 @@ export const CustomBottomNavigation: React.FC<CustomBottomNavigationProps> = ({
   }
 
   const getCurrentValue = () => {
+    // If we're on a main tab route, return that tab index
     if (activeTab >= 0) return activeTab
+    
+    // If we're on a "more" tab route, return 'more'
     const moreTab = moreTabs.find(tab => tab.value === location.pathname)
     return moreTab ? 'more' : activeTab
   }
