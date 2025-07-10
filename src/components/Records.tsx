@@ -25,7 +25,7 @@ import {
   Alert,
   TablePagination,
 } from '@mui/material'
-import { Edit, Delete, Visibility } from '@mui/icons-material'
+import { Edit, Delete } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
 import dayjs from 'dayjs'
@@ -62,10 +62,20 @@ const Records: React.FC = () => {
       setLoading(true)
       setError(null)
       
-      // Direct query to avoid infinite recursion issues
+      console.log('Fetching transactions for user:', user?.id)
+      
+      // Simple direct query to transactions table only
       const { data, error } = await supabase
         .from('transactions')
-        .select('*')
+        .select(`
+          id,
+          amount,
+          payment_method,
+          customer_name,
+          description,
+          created_at,
+          paid_status
+        `)
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
 
@@ -74,6 +84,7 @@ const Records: React.FC = () => {
         throw error
       }
       
+      console.log('Fetched transactions:', data?.length || 0)
       setTransactions(data || [])
     } catch (error: any) {
       console.error('Error fetching transactions:', error)
@@ -89,7 +100,7 @@ const Records: React.FC = () => {
   }
 
   const handleUpdate = async () => {
-    if (!selectedTransaction) return
+    if (!selectedTransaction || !user?.id) return
 
     try {
       const { error } = await supabase
@@ -102,7 +113,7 @@ const Records: React.FC = () => {
           paid_status: selectedTransaction.paid_status,
         })
         .eq('id', selectedTransaction.id)
-        .eq('user_id', user?.id) // Add user_id check for security
+        .eq('user_id', user.id)
 
       if (error) throw error
 
@@ -110,23 +121,25 @@ const Records: React.FC = () => {
       setSelectedTransaction(null)
       fetchTransactions()
     } catch (error: any) {
+      console.error('Update error:', error)
       setError(error.message)
     }
   }
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this transaction?')) return
+    if (!confirm('Are you sure you want to delete this transaction?') || !user?.id) return
 
     try {
       const { error } = await supabase
         .from('transactions')
         .delete()
         .eq('id', id)
-        .eq('user_id', user?.id) // Add user_id check for security
+        .eq('user_id', user.id)
 
       if (error) throw error
       fetchTransactions()
     } catch (error: any) {
+      console.error('Delete error:', error)
       setError(error.message)
     }
   }
