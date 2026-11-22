@@ -35,7 +35,7 @@ import './App.css'
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth()
-  const { isAdmin } = useAdmin()
+  const { isAdmin, loading: adminLoading } = useAdmin()
   const { theme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
@@ -129,7 +129,7 @@ const AppContent: React.FC = () => {
           <Route path="/stations" element={<StationManagement />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/reconciliation" element={<Reconciliation />} />
-          <Route path="/admin" element={isAdmin ? <AdminPanel /> : <Navigate to="/" replace />} />
+          <Route path="/admin" element={adminLoading ? <LoadingSpinner /> : isAdmin ? <AdminPanel /> : <Navigate to="/" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </React.Suspense>

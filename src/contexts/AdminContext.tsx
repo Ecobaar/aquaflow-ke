@@ -24,13 +24,14 @@ export const useAdmin = () => {
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth()
   const [isAdmin, setIsAdmin] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [checkedUserId, setCheckedUserId] = useState<string | null>(null)
+  const loading = !!user && checkedUserId !== user.id
 
   useEffect(() => {
     const checkAdminRole = async () => {
       if (!user) {
         setIsAdmin(false)
-        setLoading(false)
+        setCheckedUserId(null)
         return
       }
 
@@ -52,7 +53,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.error('Error checking admin role:', error)
         setIsAdmin(false)
       } finally {
-        setLoading(false)
+        setCheckedUserId(user.id)
       }
     }
 
