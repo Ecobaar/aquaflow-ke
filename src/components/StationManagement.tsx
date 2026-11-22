@@ -67,7 +67,7 @@ const StationManagement: React.FC = () => {
 
       if (error) throw error
       setStations(data || [])
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching stations:', error)
     }
   }
@@ -84,7 +84,7 @@ const StationManagement: React.FC = () => {
 
       if (error) throw error
       setMembers(data || [])
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching station members:', error)
     }
   }
@@ -100,7 +100,7 @@ const StationManagement: React.FC = () => {
         .from('stations')
         .insert({
           name: stationName,
-          owner_id: user?.id!
+          owner_id: user!.id
         })
         .select()
         .single()
@@ -112,7 +112,7 @@ const StationManagement: React.FC = () => {
         .from('station_members')
         .insert({
           station_id: data.id,
-          user_id: user?.id!,
+          user_id: user!.id,
           role: 'owner'
         })
 
@@ -120,7 +120,7 @@ const StationManagement: React.FC = () => {
       setStationName('')
       setDialogOpen(false)
       fetchStations()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: error.message })
     } finally {
       setLoading(false)
@@ -147,7 +147,7 @@ const StationManagement: React.FC = () => {
       })
       setInviteEmail('')
       setInviteDialogOpen(false)
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: 'Failed to create invitation link' })
     } finally {
       setLoading(false)

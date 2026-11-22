@@ -29,7 +29,7 @@ export const useInventory = () => {
 
       if (error) throw error
       setItems(data || [])
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching inventory:', error)
       setMessage({ type: 'error', text: 'Failed to fetch inventory items' })
     }
@@ -46,19 +46,19 @@ export const useInventory = () => {
         .single()
 
       if (error && error.code !== 'PGRST116') throw error
-      setDailySummary(data)
-    } catch (error: any) {
+      setDailySummary(data as unknown as DailyInventorySummary | null)
+    } catch (error) {
       console.error('Error fetching daily summary:', error)
     }
   }
 
-  const addOrUpdateItem = async (itemData: any, editingItem: InventoryItem | null) => {
+  const addOrUpdateItem = async (itemData: Pick<InventoryItem, 'item_name' | 'quantity' | 'unit'>, editingItem: InventoryItem | null) => {
     setLoading(true)
     setMessage(null)
 
     try {
       const data = {
-        user_id: user?.id!,
+        user_id: user!.id,
         ...itemData,
         date: new Date().toISOString().split('T')[0]
       }
@@ -68,6 +68,7 @@ export const useInventory = () => {
           .from('inventory')
           .update(data)
           .eq('id', editingItem.id)
+          .eq('user_id', user!.id)
 
         if (error) throw error
         setMessage({ type: 'success', text: 'Item updated successfully!' })
@@ -81,7 +82,7 @@ export const useInventory = () => {
       }
 
       fetchItems()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: error.message })
     } finally {
       setLoading(false)
@@ -94,16 +95,17 @@ export const useInventory = () => {
         .from('inventory')
         .delete()
         .eq('id', id)
+        .eq('user_id', user!.id)
 
       if (error) throw error
       setMessage({ type: 'success', text: 'Item deleted successfully!' })
       fetchItems()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: error.message })
     }
   }
 
-  const saveDailySummary = async (summaryData: any) => {
+  const saveDailySummary = async (summaryData: Partial<Omit<DailyInventorySummary, 'date'>>) => {
     setLoading(true)
     setMessage(null)
 
@@ -111,7 +113,7 @@ export const useInventory = () => {
       const today = new Date().toISOString().split('T')[0]
       
       const data = {
-        user_id: user?.id!,
+        user_id: user!.id,
         date: today,
         ...summaryData,
         updated_at: new Date().toISOString()
@@ -135,7 +137,7 @@ export const useInventory = () => {
 
       setMessage({ type: 'success', text: 'Daily summary saved successfully!' })
       fetchDailySummary()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: error.message })
     } finally {
       setLoading(false)

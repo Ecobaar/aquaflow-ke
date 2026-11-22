@@ -14,13 +14,24 @@ import {
 } from '@mui/material'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
 import { supabase } from '@/integrations/supabase/client'
+import type { Tables } from '@/integrations/supabase/types'
 import { useAuth } from '../contexts/AuthContext'
 import dayjs from 'dayjs'
 
+interface DailySales {
+  date: string
+  amount: number
+}
+
+interface PaymentMethodTotal {
+  method: string
+  amount: number
+}
+
 interface AnalyticsData {
-  dailySales: any[]
-  paymentMethodBreakdown: any[]
-  monthlyTrends: any[]
+  dailySales: DailySales[]
+  paymentMethodBreakdown: PaymentMethodTotal[]
+  monthlyTrends: DailySales[]
   totalRevenue: number
   totalTransactions: number
   avgTransactionValue: number
@@ -72,16 +83,16 @@ const Analytics: React.FC = () => {
       // Process data for charts
       const processedData = processAnalyticsData(transactions || [])
       setData(processedData)
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const processAnalyticsData = (transactions: any[]): AnalyticsData => {
+  const processAnalyticsData = (transactions: Tables<'transactions'>[]): AnalyticsData => {
     // Daily sales data
-    const dailySalesMap = new Map()
+    const dailySalesMap = new Map<string, number>()
     transactions.forEach(transaction => {
       const date = dayjs(transaction.created_at).format('MMM DD')
       const existing = dailySalesMap.get(date) || 0
@@ -94,7 +105,7 @@ const Analytics: React.FC = () => {
     }))
 
     // Payment method breakdown
-    const paymentMethodMap = new Map()
+    const paymentMethodMap = new Map<string, number>()
     transactions.forEach(transaction => {
       const method = transaction.payment_method
       const existing = paymentMethodMap.get(method) || 0

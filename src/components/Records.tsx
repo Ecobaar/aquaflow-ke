@@ -27,6 +27,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material'
+import type { ChipProps } from '@mui/material'
 import { Edit, Delete } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
@@ -90,7 +91,7 @@ const Records: React.FC = () => {
       
       console.log('Fetched transactions:', data?.length || 0)
       setTransactions(data || [])
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching transactions:', error)
       setError(error.message || 'Failed to load transactions')
     } finally {
@@ -124,7 +125,7 @@ const Records: React.FC = () => {
       setEditDialog(false)
       setSelectedTransaction(null)
       fetchTransactions()
-    } catch (error: any) {
+    } catch (error) {
       console.error('Update error:', error)
       setError(error.message)
     }
@@ -142,13 +143,13 @@ const Records: React.FC = () => {
 
       if (error) throw error
       fetchTransactions()
-    } catch (error: any) {
+    } catch (error) {
       console.error('Delete error:', error)
       setError(error.message)
     }
   }
 
-  const getPaymentMethodColor = (method: string) => {
+  const getPaymentMethodColor = (method: string): ChipProps['color'] => {
     switch (method) {
       case 'cash': return 'success'
       case 'till': return 'primary'
@@ -213,7 +214,7 @@ const Records: React.FC = () => {
                   <TableCell>
                     <Chip
                       label={isMobile ? transaction.payment_method.slice(0, 4) : transaction.payment_method}
-                      color={getPaymentMethodColor(transaction.payment_method) as any}
+                      color={getPaymentMethodColor(transaction.payment_method)}
                       size="small"
                       sx={{ fontSize: isMobile ? '0.6rem' : 'inherit' }}
                     />

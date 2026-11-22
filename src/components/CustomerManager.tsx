@@ -55,7 +55,7 @@ const CustomerManager: React.FC = () => {
 
       if (error) throw error
       setCustomers(data || [])
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     }
   }
@@ -85,7 +85,7 @@ const CustomerManager: React.FC = () => {
           .insert({
             name: name.trim(),
             phone: phone.trim() || null,
-            user_id: user?.id!,
+            user_id: user!.id,
           })
 
         if (error) throw error
@@ -96,7 +96,7 @@ const CustomerManager: React.FC = () => {
       setName('')
       setPhone('')
       fetchCustomers()
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)
@@ -121,7 +121,7 @@ const CustomerManager: React.FC = () => {
 
       if (error) throw error
       fetchCustomers()
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     }
   }

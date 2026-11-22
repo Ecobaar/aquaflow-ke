@@ -1,8 +1,10 @@
 
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { createTheme } from '@mui/material/styles'
 import { AuthProvider } from './contexts/AuthContext'
 import { AdminProvider } from './contexts/AdminContext'
@@ -11,17 +13,21 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { OfflineIndicator } from './components/OfflineIndicator'
 import Layout from './components/Layout'
 import Auth from './components/Auth'
-import Sales from './components/Sales'
-import Records from './components/Records'
-import Analytics from './components/Analytics'
-import Calculator from './components/Calculator'
-import Inventory from './components/Inventory'
-import Expenses from './components/Expenses'
-import CustomerManager from './components/CustomerManager'
-import DebtManager from './components/DebtManager'
-import StationManagement from './components/StationManagement'
-import UserProfile from './components/UserProfile'
-import AdminPanel from './components/AdminPanel'
+import InstallPrompt from './components/InstallPrompt'
+import { LoadingSpinner } from './components/LoadingSpinner'
+import NotFound from './pages/NotFound'
+const Sales = React.lazy(() => import('./components/Sales'))
+const Records = React.lazy(() => import('./components/Records'))
+const Analytics = React.lazy(() => import('./components/Analytics'))
+const Calculator = React.lazy(() => import('./components/Calculator'))
+const Inventory = React.lazy(() => import('./components/Inventory'))
+const Expenses = React.lazy(() => import('./components/Expenses'))
+const CustomerManager = React.lazy(() => import('./components/CustomerManager'))
+const DebtManager = React.lazy(() => import('./components/DebtManager'))
+const StationManagement = React.lazy(() => import('./components/StationManagement'))
+const UserProfile = React.lazy(() => import('./components/UserProfile'))
+const AdminPanel = React.lazy(() => import('./components/AdminPanel'))
+const Reconciliation = React.lazy(() => import('./components/Reconciliation'))
 import { useAuth } from './contexts/AuthContext'
 import { useAdmin } from './contexts/AdminContext'
 import { useTheme } from './contexts/ThemeContext'
@@ -29,7 +35,7 @@ import './App.css'
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth()
-  const { isAdmin } = useAdmin()
+  const { isAdmin, loading: adminLoading } = useAdmin()
   const { theme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
@@ -100,6 +106,7 @@ const AppContent: React.FC = () => {
 
   return (
     <MuiThemeProvider theme={muiTheme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
       <CssBaseline />
       <Layout
         activeTab={getActiveTab()}
@@ -108,6 +115,7 @@ const AppContent: React.FC = () => {
         onAdminClick={isAdmin ? handleAdminClick : undefined}
         onStationClick={handleStationClick}
       >
+        <React.Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<Sales />} />
           <Route path="/sales" element={<Sales />} />
@@ -120,9 +128,13 @@ const AppContent: React.FC = () => {
           <Route path="/debts" element={<DebtManager />} />
           <Route path="/stations" element={<StationManagement />} />
           <Route path="/profile" element={<UserProfile />} />
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/reconciliation" element={<Reconciliation />} />
+          <Route path="/admin" element={adminLoading ? <LoadingSpinner /> : isAdmin ? <AdminPanel /> : <Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
+        </React.Suspense>
       </Layout>
+      </LocalizationProvider>
     </MuiThemeProvider>
   )
 }
@@ -135,6 +147,7 @@ function App() {
           <AdminProvider>
             <Router>
               <OfflineIndicator />
+              <InstallPrompt />
               <AppContent />
             </Router>
           </AdminProvider>

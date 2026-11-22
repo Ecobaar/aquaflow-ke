@@ -13,6 +13,7 @@ import InventoryTable from './inventory/InventoryTable'
 import AddItemDialog from './inventory/AddItemDialog'
 import DailySummaryDialog from './inventory/DailySummaryDialog'
 import DailySummaryCard from './inventory/DailySummaryCard'
+import { parseStockInput } from './inventory/utils'
 import { useInventory } from './inventory/useInventory'
 
 const InventoryComponent: React.FC = () => {
@@ -61,12 +62,20 @@ const InventoryComponent: React.FC = () => {
   }
 
   const handleSaveDailySummary = async () => {
-    const openingData = openingStock ? JSON.parse(openingStock) : {}
-    const receivedData = receivedStock ? JSON.parse(receivedStock) : {}
-    const salesData = salesStock ? JSON.parse(salesStock) : {}
+    let openingData: Record<string, number>
+    let receivedData: Record<string, number>
+    let salesData: Record<string, number>
+    try {
+      openingData = parseStockInput(openingStock)
+      receivedData = parseStockInput(receivedStock)
+      salesData = parseStockInput(salesStock)
+    } catch {
+      setMessage({ type: 'error', text: 'Stock values must be valid JSON objects, e.g. {"20L Bottles": 10}' })
+      return
+    }
     
     // Calculate closing stock
-    const closingData: any = {}
+    const closingData: Record<string, number> = {}
     Object.keys(openingData).forEach(key => {
       const opening = openingData[key] || 0
       const received = receivedData[key] || 0

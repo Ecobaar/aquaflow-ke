@@ -7,14 +7,14 @@ interface SecurityEvent {
   type: 'login' | 'logout' | 'failed_login' | 'permission_denied' | 'data_access';
   timestamp: Date;
   userId?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export const useSecurityMonitoring = () => {
   const { user } = useAuth();
   const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>([]);
 
-  const logSecurityEvent = useCallback((type: SecurityEvent['type'], details?: any) => {
+  const logSecurityEvent = useCallback((type: SecurityEvent['type'], details?: unknown) => {
     const event: SecurityEvent = {
       id: Date.now().toString(),
       type,

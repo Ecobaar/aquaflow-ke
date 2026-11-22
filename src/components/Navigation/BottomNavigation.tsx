@@ -22,6 +22,7 @@ import {
   Person,
   AccountBalance,
   Group,
+  CompareArrows,
 } from '@mui/icons-material'
 
 interface CustomBottomNavigationProps {
@@ -47,6 +48,7 @@ export const CustomBottomNavigation: React.FC<CustomBottomNavigationProps> = ({
     { label: 'Inventory', value: '/inventory', icon: <Inventory /> },
     { label: 'Expenses', value: '/expenses', icon: <MonetizationOn /> },
     { label: 'Records', value: '/records', icon: <Receipt /> },
+    { label: 'Reconciliation', value: '/reconciliation', icon: <CompareArrows /> },
     { label: 'Stations', value: '/stations', icon: <Business /> },
     { label: 'Customers', value: '/customers', icon: <Group /> },
     { label: 'Debts', value: '/debts', icon: <AccountBalance /> },

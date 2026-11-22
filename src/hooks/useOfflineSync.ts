@@ -8,7 +8,7 @@ interface PendingOperation {
   id: string;
   table: TableName;
   operation: 'insert' | 'update' | 'delete';
-  data: any;
+  data: Record<string, unknown> & { id?: string | number };
   timestamp: Date;
 }
 
@@ -29,7 +29,7 @@ export const useOfflineSync = () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        setPendingOperations(parsed.map((op: any) => ({
+        setPendingOperations(parsed.map((op: PendingOperation) => ({
           ...op,
           timestamp: new Date(op.timestamp)
         })));
@@ -71,17 +71,21 @@ export const useOfflineSync = () => {
 
     for (const operation of pendingOperations) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const table = supabase.from(operation.table) as any;
+        let result: { error: unknown } | undefined;
         switch (operation.operation) {
           case 'insert':
-            await (supabase.from as any)(operation.table).insert(operation.data);
+            result = await table.insert(operation.data);
             break;
           case 'update':
-            await (supabase.from as any)(operation.table).update(operation.data).eq('id', operation.data.id);
+            result = await table.update(operation.data).eq('id', operation.data.id);
             break;
           case 'delete':
-            await (supabase.from as any)(operation.table).delete().eq('id', operation.data.id);
+            result = await table.delete().eq('id', operation.data.id);
             break;
         }
+        if (result?.error) throw result.error;
         successful.push(operation.id);
       } catch (error) {
         console.error(`Failed to sync operation ${operation.id}:`, error);
