@@ -3,6 +3,8 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { createTheme } from '@mui/material/styles'
 import { AuthProvider } from './contexts/AuthContext'
 import { AdminProvider } from './contexts/AdminContext'
@@ -104,6 +106,7 @@ const AppContent: React.FC = () => {
 
   return (
     <MuiThemeProvider theme={muiTheme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
       <CssBaseline />
       <Layout
         activeTab={getActiveTab()}
@@ -131,6 +134,7 @@ const AppContent: React.FC = () => {
         </Routes>
         </React.Suspense>
       </Layout>
+      </LocalizationProvider>
     </MuiThemeProvider>
   )
 }
