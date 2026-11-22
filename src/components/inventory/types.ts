@@ -1,3 +1,5 @@
+export type StockMap = Record<string, number>
+
 
 export interface InventoryItem {
   id: string
@@ -10,8 +12,8 @@ export interface InventoryItem {
 
 export interface DailyInventorySummary {
   date: string
-  opening_stock: any
-  received_stock: any
-  sales_stock: any
-  closing_stock: any
+  opening_stock: StockMap
+  received_stock: StockMap
+  sales_stock: StockMap
+  closing_stock: StockMap
 }

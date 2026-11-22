@@ -7,16 +7,16 @@ export interface AppError {
   message: string;
   type: 'error' | 'warning' | 'info';
   timestamp: Date;
-  details?: any;
+  details?: unknown;
 }
 
 export const useErrorHandler = () => {
   const [errors, setErrors] = useState<AppError[]>([]);
 
-  const handleError = useCallback((error: any, context?: string) => {
+  const handleError = useCallback((error: unknown, context?: string) => {
     const appError: AppError = {
       id: Date.now().toString(),
-      message: error?.message || 'An unexpected error occurred',
+      message: (error instanceof Error ? error.message : (error as { message?: string })?.message) || 'An unexpected error occurred',
       type: 'error',
       timestamp: new Date(),
       details: { error, context }

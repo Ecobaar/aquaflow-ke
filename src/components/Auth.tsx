@@ -80,7 +80,7 @@ const Auth: React.FC = () => {
       logSecurityEvent('login', { email })
       handleSuccess('Successfully signed in!')
       
-    } catch (error: any) {
+    } catch (error) {
       handleError(error, 'Sign In Failed')
     } finally {
       setLoading(false)
@@ -110,7 +110,7 @@ const Auth: React.FC = () => {
         handleSuccess('Account created successfully!')
       }
       
-    } catch (error: any) {
+    } catch (error) {
       handleError(error, 'Sign Up Failed')
     } finally {
       setLoading(false)

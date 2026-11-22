@@ -79,7 +79,7 @@ const Expenses: React.FC = () => {
       const monthly = monthlyExpenses.reduce((sum, expense) => sum + expense.amount, 0)
       setMonthlyTotal(monthly)
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching expenses:', error)
       setMessage({ type: 'error', text: 'Failed to fetch expenses' })
     }
@@ -95,7 +95,7 @@ const Expenses: React.FC = () => {
       const expenseData = {
         description: description,
         amount: parseFloat(amount),
-        user_id: user?.id!
+        user_id: user!.id
       }
 
       if (editingExpense) {
@@ -120,7 +120,7 @@ const Expenses: React.FC = () => {
       setEditingExpense(null)
       setDialogOpen(false)
       fetchExpenses()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: error.message })
     } finally {
       setLoading(false)
@@ -137,7 +137,7 @@ const Expenses: React.FC = () => {
       if (error) throw error
       setMessage({ type: 'success', text: 'Expense deleted successfully!' })
       fetchExpenses()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: error.message })
     }
   }

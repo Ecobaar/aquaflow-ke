@@ -93,7 +93,7 @@ const Reconciliation: React.FC = () => {
         netProfit,
         outstandingDebt,
       })
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)

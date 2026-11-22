@@ -15,6 +15,7 @@ import {
 import { Person, ExitToApp, Settings, Save, Business } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
+import type { Tables } from '@/integrations/supabase/types'
 
 interface UserProfile {
   id: string
@@ -28,7 +29,7 @@ interface UserProfile {
 const UserProfile: React.FC = () => {
   const { user, signOut } = useAuth()
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [stationProfile, setStationProfile] = useState<any>(null)
+  const [stationProfile, setStationProfile] = useState<Tables<'profiles'> | null>(null)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -58,7 +59,7 @@ const UserProfile: React.FC = () => {
 
       if (error && error.code !== 'PGRST116') throw error
       setStationProfile(data)
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching station profile:', error)
     }
   }
@@ -95,7 +96,7 @@ const UserProfile: React.FC = () => {
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' })
       fetchStationProfile()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: error.message })
     } finally {
       setSaving(false)
@@ -105,7 +106,7 @@ const UserProfile: React.FC = () => {
   const handleLogout = async () => {
     try {
       await signOut()
-    } catch (error: any) {
+    } catch (error) {
       setMessage({ type: 'error', text: 'Error signing out' })
     }
   }

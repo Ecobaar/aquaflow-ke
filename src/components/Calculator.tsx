@@ -52,7 +52,7 @@ const Calculator: React.FC = () => {
       const total = calculateTotal(cashInput)
       setCashTotal(total)
       updateGrandTotal(total, tillTotal)
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message)
     }
   }
@@ -63,7 +63,7 @@ const Calculator: React.FC = () => {
       const total = calculateTotal(tillInput)
       setTillTotal(total)
       updateGrandTotal(cashTotal, total)
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message)
     }
   }
@@ -89,7 +89,7 @@ const Calculator: React.FC = () => {
       const { error: summaryError } = await supabase
         .from('daily_summaries')
         .upsert({
-          user_id: user?.id!,
+          user_id: user!.id,
           date: currentDate.split('T')[0], // Just the date part
           cash_total: cashTotal,
           till_total: tillTotal,
@@ -106,7 +106,7 @@ const Calculator: React.FC = () => {
       const { error: transactionError } = await supabase
         .from('transactions')
         .insert({
-          user_id: user?.id!,
+          user_id: user!.id,
           amount: grandTotal,
           payment_method: 'mixed', // Since it's cash + till
           description: `Daily total: Cash ${cashTotal}, Till ${tillTotal}`,
@@ -124,7 +124,7 @@ const Calculator: React.FC = () => {
       setTillTotal(0)
       setGrandTotal(0)
       
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)

@@ -51,7 +51,7 @@ const Sales: React.FC = () => {
 
       if (error) throw error
       setCustomers(data || [])
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching customers:', error)
     }
   }
@@ -75,7 +75,7 @@ const Sales: React.FC = () => {
           customer_id: customerId ? parseInt(customerId) : null,
           customer_name: selectedCustomer?.name || null,
           paid_status: paymentMethod === 'debt' ? false : paidStatus,
-          user_id: user?.id!,
+          user_id: user!.id,
           description: description.trim() || null,
         })
 
@@ -86,7 +86,7 @@ const Sales: React.FC = () => {
       setCustomerId('')
       setDescription('')
       setPaidStatus(true)
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)

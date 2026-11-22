@@ -69,7 +69,7 @@ const DebtManager: React.FC = () => {
 
       if (error) throw error
       setDebts(data || [])
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)
@@ -103,7 +103,7 @@ const DebtManager: React.FC = () => {
             amount: parseFloat(amount),
             description: description.trim() || null,
             due_date: dueDate || null,
-            user_id: user?.id!,
+            user_id: user!.id,
           })
 
         if (error) throw error
@@ -112,7 +112,7 @@ const DebtManager: React.FC = () => {
       setDialogOpen(false)
       resetForm()
       fetchDebts()
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)
@@ -131,7 +131,7 @@ const DebtManager: React.FC = () => {
 
       if (error) throw error
       fetchDebts()
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     }
   }
@@ -147,7 +147,7 @@ const DebtManager: React.FC = () => {
 
       if (error) throw error
       fetchDebts()
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     }
   }

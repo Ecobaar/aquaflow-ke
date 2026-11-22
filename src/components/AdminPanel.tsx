@@ -22,13 +22,13 @@ import {
   Card,
   CardContent,
 } from '@mui/material'
+import type { ChipProps } from '@mui/material'
 import { AdminPanelSettings, People, Business } from '@mui/icons-material'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../contexts/AuthContext'
 
 interface UserProfile {
   id: string
-  email: string
   created_at: string
   station_name?: string
 }
@@ -68,13 +68,12 @@ const AdminPanel: React.FC = () => {
 
       const usersWithProfiles = profiles?.map(profile => ({
         id: profile.id,
-        email: 'user@example.com',
         created_at: profile.created_at,
         station_name: profile.station_name,
       })) || []
 
       setUsers(usersWithProfiles)
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     }
   }
@@ -87,7 +86,7 @@ const AdminPanel: React.FC = () => {
 
       if (error) throw error
       setRoles(data || [])
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)
@@ -111,7 +110,7 @@ const AdminPanel: React.FC = () => {
       setSelectedUserId('')
       setNewRole('user')
       fetchRoles()
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message)
     }
   }
@@ -121,7 +120,7 @@ const AdminPanel: React.FC = () => {
     return userRole?.role || 'user'
   }
 
-  const getRoleColor = (role: string) => {
+  const getRoleColor = (role: string): ChipProps['color'] => {
     switch (role) {
       case 'admin': return 'error'
       case 'moderator': return 'warning'
@@ -217,7 +216,7 @@ const AdminPanel: React.FC = () => {
                   <TableCell>
                     <Chip
                       label={getUserRole(user.id)}
-                      color={getRoleColor(getUserRole(user.id)) as any}
+                      color={getRoleColor(getUserRole(user.id))}
                       size="small"
                     />
                   </TableCell>
