@@ -1,6 +1,12 @@
 
 -- Make gachunga84@gmail.com an admin
-SELECT public.assign_admin_role('gachunga84@gmail.com');
+-- Only assign when the user exists, so fresh projects can apply this migration.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM auth.users WHERE email = 'gachunga84@gmail.com') THEN
+    PERFORM public.assign_admin_role('gachunga84@gmail.com');
+  END IF;
+END $$;
 
 -- Add water station name to user profiles
 CREATE TABLE public.profiles (

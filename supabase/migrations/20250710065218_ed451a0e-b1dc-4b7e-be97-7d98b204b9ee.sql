@@ -23,6 +23,7 @@ AS $$
 $$;
 
 -- Create new policy using the security definer function
+DROP POLICY IF EXISTS "Users can view station members for accessible stations" ON public.station_members;
 CREATE POLICY "Users can view station members for accessible stations"
 ON public.station_members
 FOR SELECT
