@@ -1,12 +1,12 @@
 -- Inventory rows created without a station (station_id IS NULL) were blocked by
--- station-only RLS policies. Allow users to manage their own rows, and station
--- members to manage rows belonging to stations they can access.
+-- station-only RLS policies. Allow users to manage their own station-less rows;
+-- station rows still require current station access.
 DROP POLICY IF EXISTS "Users can manage inventory for their stations" ON public.inventory;
 CREATE POLICY "Users can manage inventory for their stations"
 ON public.inventory
 FOR ALL
 USING (
-  auth.uid() = user_id
+  (station_id IS NULL AND auth.uid() = user_id)
   OR (station_id IS NOT NULL AND public.user_has_station_access(station_id, auth.uid()))
 )
 WITH CHECK (
@@ -19,7 +19,7 @@ CREATE POLICY "Users can manage daily inventory for their stations"
 ON public.daily_inventory_summary
 FOR ALL
 USING (
-  auth.uid() = user_id
+  (station_id IS NULL AND auth.uid() = user_id)
   OR (station_id IS NOT NULL AND public.user_has_station_access(station_id, auth.uid()))
 )
 WITH CHECK (
